@@ -10,8 +10,10 @@ public class Generate
     {
         //int day = DateTime.Now.Day;
         var day = 1;
+        //var year = DateTime.Now.Year;
+        var year = 2018.ToString();
         string dayStr = $"Day{day:D2}";
-        var baseDir  = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "..", "..", "..");
+        var baseDir  = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "..", "..", "..", year == "2024" ? "": year);
         {
             if (!Directory.Exists(Path.Combine(baseDir, "input")))
             {
@@ -20,7 +22,7 @@ public class Generate
             var file = Path.Combine(baseDir, "input", $"{dayStr}.input");
             if (!File.Exists(file))
             {
-                File.WriteAllText(file, GetDayInput(day).Result);
+                File.WriteAllText(file, GetDayInput(day, year).Result);
             }
         }
         {
@@ -41,7 +43,7 @@ public class Generate
                 using var writer = new StreamWriter(fs);
 
                 int pad = 0;
-                WriteLine("namespace Advent_of_Code_2024;");
+                WriteLine($"namespace Advent_of_Code_{year};");
                 WriteLine();
                 WriteLine("[TestClass]");
                 WriteLine($"public class {dayStr}");
@@ -94,7 +96,7 @@ public class Generate
                     }
                     else
                     {
-                        WriteLine($"var result = {fun}(Common.DayInput(nameof({dayStr})));");
+                        WriteLine($"var result = {fun}(Common.DayInput(nameof({dayStr}), \"{year}\"));");
                     }
                     WriteLine("""Assert.AreEqual("", result);""");
                     pad--;
@@ -109,10 +111,9 @@ public class Generate
             }
         }
     }
-    public static async Task<string> GetDayInput(int day)
+    public static async Task<string> GetDayInput(int day, string year)
     {
-        var request = new HttpRequestMessage(HttpMethod.Get, $"https://adventofcode.com/2023/day/{day}/input"); //TODO fix
-        //var request = new HttpRequestMessage(HttpMethod.Get, $"https://adventofcode.com/2024/day/{day}/input");
+        var request = new HttpRequestMessage(HttpMethod.Get, $"https://adventofcode.com/{year}/day/{day}/input"); //TODO fix
         var cookieFile = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "..", "..", "..", "Cookie.dat");
         if (!File.Exists(cookieFile))
         {

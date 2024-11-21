@@ -1,10 +1,10 @@
 ﻿namespace Advent_of_Code_2024.Commons;
 public static class Common
 {
-    public static IEnumerable<string> DayInput(string day)
+    public static IEnumerable<string> DayInput(string day, string year = "2024")
     {
-        var fileName = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "..", "..", "..",
-            "Input", $"{day}.input");
+        var baseDir = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "..", "..", "..", year == "2024" ? "" : year);
+        var fileName = Path.Combine(baseDir, "Input", $"{day}.input");
 
         Console.WriteLine($"Read from ${fileName}");
 
