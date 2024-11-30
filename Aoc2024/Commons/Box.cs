@@ -11,7 +11,7 @@ public class Box<T>: IEquatable<Box<T>>
     public T Area => Width * Height;
     public Pos<T> Size => new(Width, Height);
 
-    public Box(params Pos<T>[] positions) 
+    public Box(params Pos<T>[] positions)
     {
         Assert.IsTrue(positions.Length > 0);
         Min = new Pos<T>(positions[0]);
