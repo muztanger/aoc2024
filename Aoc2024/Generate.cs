@@ -8,12 +8,12 @@ public class Generate
     [TestMethod]
     public void GenerateDay()
     {
-        //int day = DateTime.Now.Day;
-        var day = 1;
-        //var year = DateTime.Now.Year;
-        var year = 2018.ToString();
+        int day = DateTime.Now.Day;
+        //var day = 6;
+        var year = DateTime.Now.Year;
+        //var year = 2018;
         string dayStr = $"Day{day:D2}";
-        var baseDir  = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "..", "..", "..", year == "2024" ? "": year);
+        var baseDir  = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "..", "..", "..", year == 2024 ? "": year.ToString());
         {
             if (!Directory.Exists(Path.Combine(baseDir, "input")))
             {
@@ -111,7 +111,7 @@ public class Generate
             }
         }
     }
-    public static async Task<string> GetDayInput(int day, string year)
+    public static async Task<string> GetDayInput(int day, int year)
     {
         var request = new HttpRequestMessage(HttpMethod.Get, $"https://adventofcode.com/{year}/day/{day}/input"); //TODO fix
         var cookieFile = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "..", "..", "..", "Cookie.dat");
