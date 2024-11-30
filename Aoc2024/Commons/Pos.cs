@@ -25,12 +25,12 @@ public class Pos<T> : IEquatable<Pos<T>>
 
     public T Dist() => T.Abs(y - x);
 
-    public static Pos<T> operator *(Pos<T> p1, T n) => new Pos<T>(p1.x * n, p1.y * n);
+    public static Pos<T> operator *(Pos<T> p1, T n) => new(p1.x * n, p1.y * n);
     public static Pos<T> operator *(T n, Pos<T> p1) => p1 * n;
-    public static Pos<T> operator %(Pos<T> p1, T n) => new Pos<T>(p1.x % n, p1.y % n);
-    public static Pos<T> operator %(Pos<T> p1, Pos<T> p2) => new Pos<T>(p1.x % p2.x, p1.y % p2.y);
-    public static Pos<T> operator +(Pos<T> p1, Pos<T> p2) => new Pos<T>(p1.x + p2.x, p1.y + p2.y);
-    public static Pos<T> operator -(Pos<T> p) => new Pos<T>(-p.x, -p.y);
+    public static Pos<T> operator %(Pos<T> p1, T n) => new(p1.x % n, p1.y % n);
+    public static Pos<T> operator %(Pos<T> p1, Pos<T> p2) => new(p1.x % p2.x, p1.y % p2.y);
+    public static Pos<T> operator +(Pos<T> p1, Pos<T> p2) => new(p1.x + p2.x, p1.y + p2.y);
+    public static Pos<T> operator -(Pos<T> p) => new(-p.x, -p.y);
     public static Pos<T> operator -(Pos<T> p1, Pos<T> p2) => p1 + (-p2);
 
     public static readonly Pos<T> One = new(T.One, T.One);
