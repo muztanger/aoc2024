@@ -13,7 +13,7 @@ public class Generate
         var year = DateTime.Now.Year;
         //var year = 2018;
         string dayStr = $"Day{day:D2}";
-        var baseDir  = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "..", "..", "..", year == 2024 ? "": year.ToString());
+        var baseDir = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "..", "..", "..", year == 2024 ? "" : year.ToString());
         {
             if (!Directory.Exists(Path.Combine(baseDir, "input")))
             {
@@ -107,7 +107,7 @@ public class Generate
                 WriteLine("}");
 
                 string Padding() => new(' ', 4 * pad);
-                void WriteLine(string str="") => writer.WriteLine($"{Padding()}{str}");
+                void WriteLine(string str = "") => writer.WriteLine($"{Padding()}{str}");
             }
         }
     }

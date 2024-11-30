@@ -1,5 +1,4 @@
-﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
-namespace Advent_of_Code_2024.Commons;
+﻿namespace Advent_of_Code_2024.Commons;
 
 [TestClass]
 public class TestCommon

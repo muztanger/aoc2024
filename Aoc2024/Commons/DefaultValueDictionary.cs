@@ -14,8 +14,8 @@ public class DefaultValueDictionary<TKey, TValue> : IEnumerable<KeyValuePair<TKe
 
     public Dictionary<TKey, TValue> Inner => mDict;
 
-    public TValue this[TKey key] 
-    { 
+    public TValue this[TKey key]
+    {
         get => GetValue(key);
         set => SetValue(key, value);
     }

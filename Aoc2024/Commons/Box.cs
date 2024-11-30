@@ -1,6 +1,6 @@
 ﻿namespace Advent_of_Code_2024.Commons;
 
-public class Box<T>: IEquatable<Box<T>>
+public class Box<T> : IEquatable<Box<T>>
     where T : INumber<T>
 {
     public Pos<T> Min { get; set; }

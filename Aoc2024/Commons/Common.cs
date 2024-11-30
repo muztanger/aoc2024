@@ -23,7 +23,7 @@ public static class Common
             yield return line;
             counter++;
         }
-        
+
         Console.WriteLine("There were {0} lines.", counter);
     }
 

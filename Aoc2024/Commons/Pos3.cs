@@ -1,6 +1,6 @@
 ﻿namespace Advent_of_Code_2024.Commons;
 
-public class Pos3<T> : IEquatable<Pos3<T>> where T : INumber<T> 
+public class Pos3<T> : IEquatable<Pos3<T>> where T : INumber<T>
 {
     public T x;
     public T y;
@@ -47,7 +47,7 @@ public class Pos3<T> : IEquatable<Pos3<T>> where T : INumber<T>
     }
 
     internal TResult Dist<TResult>(Pos3<T> p1)
-        where TResult: IFloatingPoint<TResult>, IRootFunctions<TResult>
+        where TResult : IFloatingPoint<TResult>, IRootFunctions<TResult>
     {
         Pos3<T> delta = p1 - this;
         var dx = TResult.CreateChecked(delta.x);
@@ -78,7 +78,8 @@ public class Pos3<T> : IEquatable<Pos3<T>> where T : INumber<T>
 
     public override int GetHashCode()
     {
-        unchecked {
+        unchecked
+        {
             int hash = (int)199933;
             hash = (hash * 993319) ^ x.GetHashCode();
             hash = (hash * 993319) ^ y.GetHashCode();
