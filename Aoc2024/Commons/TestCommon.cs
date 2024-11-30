@@ -153,18 +153,27 @@ public class TestCommon
     [TestMethod]
     public void TestAllCombos()
     {
-        var bag = new List<List<int>>();
-        bag.Add(new List<int> { 1 });
-        bag.Add(new List<int> { 2 });
-        bag.Add(new List<int> { 3 });
-        bag.Add(new List<int> { 1, 2 });
-        bag.Add(new List<int> { 1, 3 });
-        bag.Add(new List<int> { 2, 3 });
-        bag.Add(new List<int> { 1, 2, 3 });
-        var c = 0;
+        var expected = new List<List<int>>
+        {
+            ([1]),
+            ([2]),
+            ([3]),
+            ([1, 2]),
+            ([1, 3]),
+            ([2, 3]),
+            ([1, 2, 3])
+        };
+
+        var permutationCount = 0;
+        foreach (var list in Common.GetAllCombos([1, 2, 3]))
+        {
+            Assert.IsTrue(Exist(list), string.Join(", ", list));
+            permutationCount++;
+        }
+
         bool Exist(List<int> x)
         {
-            foreach (var list in bag)
+            foreach (var list in expected)
             {
                 var success = true;
                 if (x.Count != list.Count) continue;
@@ -180,12 +189,8 @@ public class TestCommon
             }
             return false;
         }
-        foreach (var list in Common.GetAllCombos(new List<int> { 1, 2, 3 }))
-        {
-            Assert.IsTrue(Exist(list), string.Join(", ", list));
-            c++;
-        }
-        Assert.AreEqual(bag.Count, c);
+
+        Assert.AreEqual(expected.Count, permutationCount);
     }
 
 
