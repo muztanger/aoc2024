@@ -7,7 +7,7 @@ public class TestCommon
     [TestMethod]
     public void TestPos()
     {
-        Assert.AreEqual(new Pos<int>(1,1), new Pos<int>(1,1));
+        Assert.AreEqual(new Pos<int>(1, 1), new Pos<int>(1, 1));
     }
 
     [TestMethod]
@@ -92,6 +92,65 @@ public class TestCommon
     }
 
     [TestMethod]
+    public void TestBenchmarkPosN()
+    {
+        var timer = new System.Diagnostics.Stopwatch();
+
+        var random = new Random();
+
+        // Trigger garbage collection and wait for pending finalizers
+        GC.Collect();
+        GC.WaitForPendingFinalizers();
+
+        // Capture initial garbage collection counts
+        int initialGen0Collections = GC.CollectionCount(0);
+        int initialGen1Collections = GC.CollectionCount(1);
+        int initialGen2Collections = GC.CollectionCount(2);
+
+
+        timer.Start();
+        for (int i = 0; i < 1_000_000; i++)
+        {
+            var p1 = new PosN<long>(random.Next(), random.Next(), random.Next(), random.Next());
+            var p2 = new PosN<long>(random.Next(), random.Next(), random.Next(), random.Next());
+            var p3 = p1 + p2;
+            Assert.AreEqual(new PosN<long>(
+                p1[0] + p2[0],
+                p1[1] + p2[1],
+                p1[2] + p2[2],
+                p1[3] + p2[3]), p3);
+        }
+        timer.Stop();
+
+        // Capture final garbage collection counts
+        int finalGen0Collections = GC.CollectionCount(0);
+        int finalGen1Collections = GC.CollectionCount(1);
+        int finalGen2Collections = GC.CollectionCount(2);
+
+        // Calculate the number of garbage collections that occurred
+        int gen0Collections = finalGen0Collections - initialGen0Collections;
+        int gen1Collections = finalGen1Collections - initialGen1Collections;
+        int gen2Collections = finalGen2Collections - initialGen2Collections;
+
+        Console.WriteLine($"Elapsed time: {timer.ElapsedMilliseconds} ms");
+        Console.WriteLine($"Gen 0 collections: {gen0Collections}");
+        Console.WriteLine($"Gen 1 collections: {gen1Collections}");
+        Console.WriteLine($"Gen 2 collections: {gen2Collections}");
+
+        // 2024-11-30: 1_000_000 iterations with 4 elements in PosN<long> and List<long> values
+        //     Elapsed time: 610 ms
+        //     Gen 0 collections: 126
+        //     Gen 1 collections: 1
+        //     Gen 2 collections: 0
+
+        // 2024-11-30: 1_000_000 iterations with 4 elements in PosN<long> and ReadOnlyMemory<long> values
+        //     Elapsed time: 367 ms
+        //     Gen 0 collections: 42
+        //     Gen 1 collections: 1
+        //     Gen 2 collections: 0
+    }
+
+    [TestMethod]
     public void TestAllCombos()
     {
         var bag = new List<List<int>>();
@@ -128,4 +187,6 @@ public class TestCommon
         }
         Assert.AreEqual(bag.Count, c);
     }
+
+
 }
