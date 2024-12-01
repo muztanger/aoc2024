@@ -5,37 +5,36 @@ public class Day01
 {
     private static string Part1(IEnumerable<string> input)
     {
-        var list1 = new List<int>();
-        var list2 = new List<int>();
+        var leftLocations = new List<int>();
+        var rightLocations = new List<int>();
         foreach (var line in input)
         {
             var split = line.Split(' ', StringSplitOptions.RemoveEmptyEntries);
-            list1.Add(int.Parse(split[0]));
-            list2.Add(int.Parse(split[1]));
+            leftLocations.Add(int.Parse(split[0]));
+            rightLocations.Add(int.Parse(split[1]));
         }
 
-        return list1.OrderBy(x => x)
-                    .Zip(list2.OrderBy(y => y))
-                    .Select(v => Math.Abs(v.First - v.Second))
-                    .Sum()
+        return leftLocations.OrderBy(x => x)
+                    .Zip(rightLocations.OrderBy(y => y))
+                    .Sum(z => Math.Abs(z.First - z.Second))
                     .ToString();
     }
     
     private static string Part2(IEnumerable<string> input)
     {
-        var list1 = new List<int>();
-        var list2 = new List<int>();
-        var counts = new DefaultValueDictionary<int, int>(() => 0);
+        var leftLocations = new List<int>();
+        var rightLocations = new List<int>();
+        var rightCounts = new DefaultValueDictionary<int, int>(() => 0);
         foreach (var line in input)
         {
             var split = line.Split(' ', StringSplitOptions.RemoveEmptyEntries);
-            list1.Add(int.Parse(split[0]));
-            int v2 = int.Parse(split[1]);
-            list2.Add(v2);
-            counts[v2] = counts[v2] + 1;
+            leftLocations.Add(int.Parse(split[0]));
+            int rightLocation = int.Parse(split[1]);
+            rightLocations.Add(rightLocation);
+            rightCounts[rightLocation] = rightCounts[rightLocation] + 1;
         }
 
-        return list1.Sum(x => x * counts[x]).ToString();
+        return leftLocations.Sum(x => x * rightCounts[x]).ToString();
     }
     
     [TestMethod]
