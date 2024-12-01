@@ -9,7 +9,7 @@ public class Day01
         var rightLocations = new List<int>();
         foreach (var line in input)
         {
-            var split = line.Split(' ', StringSplitOptions.RemoveEmptyEntries);
+            var split = line.SplitTrim(' ');
             leftLocations.Add(int.Parse(split[0]));
             rightLocations.Add(int.Parse(split[1]));
         }
@@ -27,7 +27,7 @@ public class Day01
         var rightCounts = new DefaultValueDictionary<int, int>(() => 0);
         foreach (var line in input)
         {
-            var split = line.Split(' ', StringSplitOptions.RemoveEmptyEntries);
+            var split = line.SplitTrim(' ');
             leftLocations.Add(int.Parse(split[0]));
             int rightLocation = int.Parse(split[1]);
             rightLocations.Add(rightLocation);

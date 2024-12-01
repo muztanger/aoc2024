@@ -193,4 +193,47 @@ public class TestCommon
     }
 
 
+    [DataTestMethod]
+    [DataRow("", " ", new string[] { })]
+    [DataRow("a", " ", new string[] { "a" })]
+    [DataRow(" ", " ", new string[] { })]
+    [DataRow("a", ",", new string[] { "a" })]
+    [DataRow(" , , , ", ",", new string[] { })]
+    [DataRow("a b c", " ", new string[] { "a", "b", "c" })]
+    [DataRow("  a   b c             ", " ", new string[] { "a", "b", "c" })]
+    [DataRow("a, b, c", ",", new string[] { "a", "b", "c" })]
+    [DataRow("    a,   b , c    ,         ", ",", new string[] { "a", "b", "c" })]
+    [DataRow("a,,b,,c", ",", new string[] { "a", "b", "c" })]
+    [DataRow(",,a,,b,,c,,", ",", new string[] { "a", "b", "c" })]
+    public void TestSplitTrimWithString(string input, string separator, string[] expected)
+    {
+        var actual = input.SplitTrim(separator);
+        Assert.AreEqual(expected.Length, actual.Length);
+        for (int i = 0; i < expected.Length; i++)
+        {
+            Assert.AreEqual(expected[i], actual[i]);
+        }
+    }
+
+    [DataTestMethod]
+    [DataRow("", ' ', new string[] { })]
+    [DataRow("a", ' ', new string[] { "a" })]
+    [DataRow(" ", ' ', new string[] { })]
+    [DataRow("a", ',', new string[] { "a" })]
+    [DataRow(" , , , ", ',', new string[] { })]
+    [DataRow("a b c", ' ', new string[] { "a", "b", "c" })]
+    [DataRow("  a   b c             ", ' ', new string[] { "a", "b", "c" })]
+    [DataRow("a, b, c", ',', new string[] { "a", "b", "c" })]
+    [DataRow("    a,   b , c    ,         ", ',', new string[] { "a", "b", "c" })]
+    [DataRow("a,,b,,c", ',', new string[] { "a", "b", "c" })]
+    [DataRow(",,a,,b,,c,,", ',', new string[] { "a", "b", "c" })]
+    public void TestSplitTrimWithChar(string input, char separator, string[] expected)
+    {
+        var actual = input.SplitTrim(separator);
+        Assert.AreEqual(expected.Length, actual.Length);
+        for (int i = 0; i < expected.Length; i++)
+        {
+            Assert.AreEqual(expected[i], actual[i]);
+        }
+    }
 }

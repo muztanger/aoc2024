@@ -210,7 +210,20 @@ public class GeneralizedComparer<T> : IComparer<T> where T : IComparable
 //    int IComparer<T>.Compare(T? x, T? y) { return inner.Compare(y, x); }
 //}
 
-public static class ArrayExt
+public static class StringExtensions
+{
+    public static string[] SplitTrim(this string src, string separator)
+    {
+        return src.Split(separator, StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries);
+    }
+
+    public static string[] SplitTrim(this string src, char separator)
+    {
+        return src.Split(separator, StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries);
+    }
+}
+
+public static class ArrayExtensions
 {
     public static void Deconstruct<T>(this T[] srcArray, out T out0)
     {
