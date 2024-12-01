@@ -9,9 +9,7 @@ public class Generate
     public void GenerateDay()
     {
         int day = DateTime.Now.Day;
-        //var day = 6;
         var year = DateTime.Now.Year;
-        //var year = 2018;
         string dayStr = $"Day{day:D2}";
         var baseDir = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "..", "..", "..", year == 2024 ? "" : year.ToString());
         {

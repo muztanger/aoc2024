@@ -5,7 +5,6 @@ public class Day01
 {
     private static string Part1(IEnumerable<string> input)
     {
-        var result = 0;
         var list1 = new List<int>();
         var list2 = new List<int>();
         foreach (var line in input)
@@ -14,31 +13,29 @@ public class Day01
             list1.Add(int.Parse(split[0]));
             list2.Add(int.Parse(split[1]));
         }
-        list1.Sort();
-        list2.Sort();
-        for (int i = 0; i < list1.Count; i++)
-        {
-            result += Math.Abs(list1[i] - list2[i]);
-        }
-        return result.ToString();
+
+        return list1.OrderBy(x => x)
+                    .Zip(list2.OrderBy(y => y))
+                    .Select(v => Math.Abs(v.First - v.Second))
+                    .Sum()
+                    .ToString();
     }
     
     private static string Part2(IEnumerable<string> input)
     {
-        var result = 0;
         var list1 = new List<int>();
         var list2 = new List<int>();
+        var counts = new DefaultValueDictionary<int, int>(() => 0);
         foreach (var line in input)
         {
             var split = line.Split(' ', StringSplitOptions.RemoveEmptyEntries);
             list1.Add(int.Parse(split[0]));
-            list2.Add(int.Parse(split[1]));
+            int v2 = int.Parse(split[1]);
+            list2.Add(v2);
+            counts[v2] = counts[v2] + 1;
         }
-        for (int i = 0; i < list1.Count; i++)
-        {
-            result += list1[i] *= list2.Count(x => x == list1[i]);
-        }
-        return result.ToString();
+
+        return list1.Sum(x => x * counts[x]).ToString();
     }
     
     [TestMethod]
