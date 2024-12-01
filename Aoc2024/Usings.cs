@@ -9,3 +9,4 @@ global using System.Numerics;
 global using System.Text;
 global using System.Text.RegularExpressions;
 global using System.Threading.Tasks;
+global using Advent_of_Code_2024.Commons;
