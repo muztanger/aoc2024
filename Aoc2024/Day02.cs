@@ -1,3 +1,4 @@
+using Advent_of_Code_2024.Commons;
 using System.Security.Cryptography;
 
 namespace Advent_of_Code_2024;
@@ -121,8 +122,28 @@ public class Day02
     [TestMethod]
     public void Day02_Part2()
     {
-        var result = Part2(Common.DayInput(nameof(Day02), "2024"));
-        Assert.AreEqual("", result);
+        IEnumerable<string> input = Common.DayInput(nameof(Day02), "2024");
+        var timer = new System.Diagnostics.Stopwatch();
+
+        long mem = GC.GetTotalAllocatedBytes();
+        timer.Start();
+        var result = Part2(input);
+        timer.Stop();
+        mem = GC.GetTotalAllocatedBytes() - mem;
+        Console.WriteLine($"Elapsed time: {timer.ElapsedMilliseconds} ms");
+        Console.WriteLine($"Allocated bytes: {mem / 1024.0:N2} kb");
+
+        // Enumerators/Linq
+        //    There were 1000 lines.
+        //    Elapsed time: 7 ms
+        //    Allocated bytes: 2,297.09 kb
+
+        // This implementation
+        //    There were 1000 lines.
+        //    Elapsed time: 6 ms
+        //    Allocated bytes: 821.55 kb
+
+        Assert.AreEqual("488", result);
     }
     
 }
