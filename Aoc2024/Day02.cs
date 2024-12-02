@@ -43,23 +43,10 @@ public class Day02
             {
                 return true;
             }
-
-            var check = new HashSet<int>();
-            var angle = Math.Sign(levels[1] - levels[0]);
-            for (int i = 0; i < levels.Count - 1; i++)
-            {
-                var da = levels[i + 1] - levels[i];
-                if (Math.Sign(da) != angle || Math.Abs(da) < 1 || Math.Abs(da) > 3)
-                {
-                    check.Add(i);
-                    check.Add(i + 1);
-                }
-
-            }
-            foreach (var index in check)
+            for (int i = 0; i < levels.Count; i++)
             {
                 var ll = new List<int>(levels);
-                ll.RemoveAt(index);
+                ll.RemoveAt(i);
                 if (IsSafe(ll))
                 {
                     return true;
