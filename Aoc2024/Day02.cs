@@ -103,7 +103,7 @@ public class Day02
     public void Day02_Part1()
     {
         var result = Part1(Common.DayInput(nameof(Day02), "2024"));
-        Assert.AreEqual("", result);
+        Assert.AreEqual("432", result);
     }
 
     [DataTestMethod]
