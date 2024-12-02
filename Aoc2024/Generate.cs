@@ -12,17 +12,7 @@ public class Generate
         var year = DateTime.Now.Year;
         string dayStr = $"Day{day:D2}";
         var baseDir = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "..", "..", "..", year == 2024 ? "" : year.ToString());
-        {
-            if (!Directory.Exists(Path.Combine(baseDir, "input")))
-            {
-                Directory.CreateDirectory(Path.Combine(baseDir, "input"));
-            }
-            var file = Path.Combine(baseDir, "input", $"{dayStr}.input");
-            if (!File.Exists(file))
-            {
-                File.WriteAllText(file, GetDayInput(day, year).Result);
-            }
-        }
+
         {
             var file = Path.Combine(baseDir, $"{dayStr}.cs");
             if (!File.Exists(file))
@@ -106,6 +96,17 @@ public class Generate
 
                 string Padding() => new(' ', 4 * pad);
                 void WriteLine(string str = "") => writer.WriteLine($"{Padding()}{str}");
+            }
+        }
+        {
+            if (!Directory.Exists(Path.Combine(baseDir, "input")))
+            {
+                Directory.CreateDirectory(Path.Combine(baseDir, "input"));
+            }
+            var file = Path.Combine(baseDir, "input", $"{dayStr}.input");
+            if (!File.Exists(file))
+            {
+                File.WriteAllText(file, GetDayInput(day, year).Result);
             }
         }
     }
