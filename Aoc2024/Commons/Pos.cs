@@ -33,7 +33,46 @@ public class Pos<T> : IEquatable<Pos<T>>
     public static Pos<T> operator -(Pos<T> p) => new(-p.x, -p.y);
     public static Pos<T> operator -(Pos<T> p1, Pos<T> p2) => p1 + (-p2);
 
+    public static readonly Pos<T> Zero = new(T.Zero, T.Zero);
     public static readonly Pos<T> One = new(T.One, T.One);
+
+    public static readonly Pos<T> East = new(T.One, T.Zero);
+    public static readonly Pos<T> South = new(T.Zero, T.One);
+    public static readonly Pos<T> West = new(-T.One, T.Zero);
+    public static readonly Pos<T> North = new(T.Zero, -T.One);
+
+    public static readonly Pos<T> SouthEast = South + East;
+    public static readonly Pos<T> SouthWest = South + West;
+    public static readonly Pos<T> NorthWest = North + West;
+    public static readonly Pos<T> NorthEast = North + East;
+
+    public static readonly List<Pos<T>> CardinalDirections = new()
+    {
+        East,
+        South,
+        West,
+        North
+    };
+
+    public static readonly List<Pos<T>> CompassDirections = new()
+    {
+        East,
+        SouthEast,
+        South,
+        SouthWest,
+        West,
+        NorthWest,
+        North,
+        NorthEast
+    };
+
+    public static readonly List<Pos<T>> Diagonals = new()
+    {
+        SouthEast,
+        SouthWest,
+        NorthWest,
+        NorthEast
+    };
 
     public void Set(Pos<T> other)
     {
@@ -135,4 +174,8 @@ public class Pos<T> : IEquatable<Pos<T>>
     {
         return new Pos<T>(T.Abs(x), T.Abs(y));
     }
+
+
+
+
 }
