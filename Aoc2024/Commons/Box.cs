@@ -72,6 +72,28 @@ public class Box<T> : IEquatable<Box<T>>
         return true;
     }
 
+    public IEnumerable<Pos<T>> GetPositions()
+    {
+        for (T y = Min.y; y <= Max.y; y += T.One)
+        {
+            for (T x = Min.x; x <= Max.x; x += T.One)
+            {
+                yield return new Pos<T>(x, y);
+            }
+        }
+    }
+
+    public IEnumerable<Pos<T>> GetPositionsByColumn()
+    {
+        for (T x = Min.x; x <= Max.x; x += T.One)
+        {
+            for (T y = Min.y; y <= Max.y; y += T.One)
+            {
+                yield return new Pos<T>(x, y);
+            }
+        }
+    }
+
     public Box<T>? Intersection(Box<T> other)
     {
         if (Max.x < other.Min.x || other.Max.x < Min.x) return null;
