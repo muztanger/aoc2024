@@ -17,32 +17,28 @@ public class Day04
             }
             board.Add(line);
         }
-        var box = new Box<int>(new Pos<int>(0, 0), new Pos<int>(board[0].Length - 1, board.Count - 1));
+        var box = new Box<int>(board[0].Length, board.Count);
 
         const string xmas = "XMAS";
-        var directions = Pos<int>.CompassDirections;
-        for (int y = 0; y < box.Height; y++)
+        foreach (var start in box.GetPositions())
         {
-            for (int x = 0; x < box.Width; x++)
+            foreach (var dir in Pos<int>.CompassDirections)
             {
-                foreach (var dir in directions)
+                var pos = start;
+                var found = true;
+                for (int i = 0; i < xmas.Length; i++)
                 {
-                    var pos = new Pos<int>(x, y);
-                    var found = true;
-                    for (int i = 0; i < xmas.Length; i++)
+                    if (!box.Contains(pos) || board[pos.y][pos.x] != xmas[i])
                     {
-                        if (!box.Contains(pos) || board[pos.y][pos.x] != xmas[i])
-                        {
-                            found = false;
-                            break;
-                        }
+                        found = false;
+                        break;
+                    }
 
-                        pos += dir;
-                    }
-                    if (found)
-                    {
-                        result++;
-                    }
+                    pos += dir;
+                }
+                if (found)
+                {
+                    result++;
                 }
             }
         }
@@ -61,40 +57,35 @@ public class Day04
             }
             board.Add(line);
         }
-        var box = new Box<int>(new Pos<int>(0, 0), new Pos<int>(board[0].Length - 1, board.Count - 1));
+        var box = new Box<int>(board[0].Length, board.Count);
         const string mas = "MAS";
-        var directions = Pos<int>.Diagonals;
 
-        for (int y = 0; y < box.Height; y++)
+        foreach (var center in box.GetPositions())
         {
-            for (int x = 0; x < box.Width; x++)
+            if (board[center.y][center.x] != 'A')
             {
-                if (board[y][x] != 'A')
+                continue;
+            }
+            var count = 0;
+            foreach (var dir in Pos<int>.Diagonals)
+            {
+                var pos = center + dir;
+                for (int i = 0; i < mas.Length; i++)
                 {
-                    continue;
-                }
-                var count = 0;
-                foreach (var dir in directions)
-                {
-                    var center = new Pos<int>(x, y);
-                    var pos = center + dir;
-                    for (int i = 0; i < mas.Length; i++)
+                    if (!box.Contains(pos) || board[pos.y][pos.x] != mas[i])
                     {
-                        if (!box.Contains(pos) || board[pos.y][pos.x] != mas[i])
-                        {
-                            break;
-                        }
-                        if (i == mas.Length - 1)
-                        {
-                            count++;
-                        }
-                        pos -= dir;
+                        break;
                     }
+                    if (i == mas.Length - 1)
+                    {
+                        count++;
+                    }
+                    pos -= dir;
                 }
-                if (count >= 2)
-                {
-                    result++;
-                }
+            }
+            if (count >= 2)
+            {
+                result++;
             }
         }
         return result.ToString();
