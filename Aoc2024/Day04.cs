@@ -62,7 +62,6 @@ public class Day04
         }
         var box = new Box<int>(new Pos<int>(0, 0), new Pos<int>(board[0].Length - 1, board.Count - 1));
         const string mas = "MAS";
-        const string test = "MS";
         var directions = new List<Pos<int>> { new(1, 1), new(-1, 1), new(-1, -1), new(1, -1) };
 
         for (int y = 0; y < box.Height; y++)
@@ -73,15 +72,27 @@ public class Day04
                 {
                     continue;
                 }
+                var count = 0;
                 foreach (var dir in directions)
                 {
-                    var pos = new Pos<int>(x, y);
-                    //TODO
-                    var found = true;
-                    if (found)
+                    var center = new Pos<int>(x, y);
+                    var pos = center + dir;
+                    for (int i = 0; i < mas.Length; i++)
                     {
-                        result++;
+                        if (!box.Contains(pos) || board[pos.y][pos.x] != mas[i])
+                        {
+                            break;
+                        }
+                        if (i == mas.Length - 1)
+                        {
+                            count++;
+                        }
+                        pos -= dir;
                     }
+                }
+                if (count >= 2)
+                {
+                    result++;
                 }
             }
         }
