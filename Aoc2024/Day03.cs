@@ -17,9 +17,9 @@ public partial class Day03
             var matches = Part1Regex().Matches(line);
             foreach (Match match in matches)
             {
-            var a = int.Parse(match.Groups[1].Value);
-            var b = int.Parse(match.Groups[2].Value);
-            result += a * b;
+                var a = int.Parse(match.Groups[1].Value);
+                var b = int.Parse(match.Groups[2].Value);
+                result += a * b;
             }
         }
         return result.ToString();
