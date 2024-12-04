@@ -116,14 +116,14 @@ public class Day04
             MXMXAXMASX
             """;
         var result = Part1(Common.GetLines(input));
-        Assert.AreEqual("", result);
+        Assert.AreEqual("18", result);
     }
     
     [TestMethod]
     public void Day04_Part1()
     {
         var result = Part1(Common.DayInput(nameof(Day04), "2024"));
-        Assert.AreEqual("", result);
+        Assert.AreEqual("2536", result);
     }
     
     [TestMethod]
@@ -142,24 +142,14 @@ public class Day04
             MXMXAXMASX
             """;
         var result = Part2(Common.GetLines(input));
-        Assert.AreEqual("", result);
-    }
-    
-    [TestMethod]
-    public void Day04_Part2_Example02()
-    {
-        var input = """
-            <TODO>
-            """;
-        var result = Part2(Common.GetLines(input));
-        Assert.AreEqual("", result);
+        Assert.AreEqual("9", result);
     }
     
     [TestMethod]
     public void Day04_Part2()
     {
         var result = Part2(Common.DayInput(nameof(Day04), "2024"));
-        Assert.AreEqual("", result);
+        Assert.AreEqual("1875", result);
     }
     
 }
