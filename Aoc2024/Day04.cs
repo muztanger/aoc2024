@@ -18,8 +18,9 @@ public class Day04
             board.Add(line);
         }
         var box = new Box<int>(new Pos<int>(0, 0), new Pos<int>(board[0].Length - 1, board.Count - 1));
+
         const string xmas = "XMAS";
-        var directions = new List<Pos<int>> {new (1, 0), new (1, 1), new (0, 1), new (-1, 1), new (-1, 0), new (-1, -1), new (0, -1), new (1, -1)};
+        var directions = Pos<int>.CompassDirections;
         for (int y = 0; y < box.Height; y++)
         {
             for (int x = 0; x < box.Width; x++)
@@ -62,7 +63,7 @@ public class Day04
         }
         var box = new Box<int>(new Pos<int>(0, 0), new Pos<int>(board[0].Length - 1, board.Count - 1));
         const string mas = "MAS";
-        var directions = new List<Pos<int>> { new(1, 1), new(-1, 1), new(-1, -1), new(1, -1) };
+        var directions = Pos<int>.Diagonals;
 
         for (int y = 0; y < box.Height; y++)
         {
