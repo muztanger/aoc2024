@@ -21,11 +21,20 @@ public class Day05
             return result;
         }
 
+
+        internal bool IsCorrect(Update update)
+        {
+            if (!update.Pages.Contains(Left) || !update.Pages.Contains(Right))
+            {
+                return true;
+            }
+            return update.Pages.IndexOf(Left) < update.Pages.IndexOf(Right);
+        }
     }
 
     class Update
     {
-        List<int> Pages { init; get; } = new();
+        internal List<int> Pages { init; get; } = new();
 
         internal static Update Parse(string line)
         {
@@ -40,28 +49,43 @@ public class Day05
 
     private static string Part1(IEnumerable<string> input)
     {
-        var result = new StringBuilder();
+        var result = 0;
         var rules = new List<Rule>();
         var updates = new List<Update>();
-        var isRules = true;
         foreach (var line in input)
         {
-            if (string.IsNullOrWhiteSpace(line) && updates.Any())
+            if (string.IsNullOrWhiteSpace(line))
             {
-                isRules = false;
                 continue;
             }
-            if (isRules)
+            if (line.Contains('|'))
             {
                 var rule = Rule.Parse(line);
                 rules.Add(rule);
             }
-            else
+            else if (line.Contains(','))
             {
                 var update = Update.Parse(line);
                 updates.Add(update);
             }
         }
+        foreach (var update in updates)
+        {
+            var isCorrect = true;
+            foreach (var rule in rules)
+            {
+                if (!rule.IsCorrect(update))
+                {
+                    isCorrect = false;
+                    break;
+                }
+            }
+            if (isCorrect)
+            {
+                result += update.Pages[update.Pages.Count / 2];
+            }
+        }
+
         return result.ToString();
     }
     
