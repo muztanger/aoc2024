@@ -135,24 +135,14 @@ public class Day06
             ......#...
             """;
         var result = Part1(Common.GetLines(input));
-        Assert.AreEqual("", result);
-    }
-    
-    [TestMethod]
-    public void Day06_Part1_Example02()
-    {
-        var input = """
-            <TODO>
-            """;
-        var result = Part1(Common.GetLines(input));
-        Assert.AreEqual("", result);
+        Assert.AreEqual("41", result);
     }
     
     [TestMethod]
     public void Day06_Part1()
     {
         var result = Part1(Common.DayInput(nameof(Day06), "2024"));
-        Assert.AreEqual("", result);
+        Assert.AreEqual("4656", result);
     }
     
     [TestMethod]
@@ -171,24 +161,14 @@ public class Day06
             ......#...
             """;
         var result = Part2(Common.GetLines(input));
-        Assert.AreEqual("", result);
-    }
-    
-    [TestMethod]
-    public void Day06_Part2_Example02()
-    {
-        var input = """
-            <TODO>
-            """;
-        var result = Part2(Common.GetLines(input));
-        Assert.AreEqual("", result);
+        Assert.AreEqual("6", result);
     }
     
     [TestMethod]
     public void Day06_Part2()
     {
         var result = Part2(Common.DayInput(nameof(Day06), "2024"));
-        Assert.AreEqual("", result);
+        Assert.AreEqual("1575", result);
     }
     
 }

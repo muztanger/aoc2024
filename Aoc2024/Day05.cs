@@ -189,14 +189,14 @@ public class Day05
             97,13,75,29,47
             """;
         var result = Part1(Common.GetLines(input));
-        Assert.AreEqual("", result);
+        Assert.AreEqual("143", result);
     }
     
     [TestMethod]
     public void Day05_Part1()
     {
         var result = Part1(Common.DayInput(nameof(Day05), "2024"));
-        Assert.AreEqual("", result);
+        Assert.AreEqual("4957", result);
     }
     
     [TestMethod]
@@ -233,14 +233,14 @@ public class Day05
             97,13,75,29,47
             """;
         var result = Part2(Common.GetLines(input));
-        Assert.AreEqual("", result);
+        Assert.AreEqual("123", result);
     }
     
     [TestMethod]
     public void Day05_Part2()
     {
         var result = Part2(Common.DayInput(nameof(Day05), "2024"));
-        Assert.AreEqual("", result);
+        Assert.AreEqual("6938", result);
     }
     
 }
