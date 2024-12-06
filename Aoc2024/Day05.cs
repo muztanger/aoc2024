@@ -72,16 +72,7 @@ public class Day05
         }
         foreach (var update in updates)
         {
-            var isCorrect = true;
-            foreach (var rule in rules)
-            {
-                if (!rule.IsCorrect(update))
-                {
-                    isCorrect = false;
-                    break;
-                }
-            }
-            if (isCorrect)
+            if (rules.All(r => r.IsCorrect(update)))
             {
                 result += update.Pages[update.Pages.Count / 2];
             }
@@ -113,7 +104,7 @@ public class Day05
             }
         }
 
-        foreach (var update in updates.Where((u) => !CheckRules(rules, u)))
+        foreach (var update in updates.Where((u) => rules.Any((r) => !r.IsCorrect(u))))
         {
             var isChanged = true;
             while (isChanged)
@@ -139,21 +130,6 @@ public class Day05
         }
 
         return result.ToString();
-    }
-
-    private static bool CheckRules(List<Rule> rules, Update update)
-    {
-        var isCorrect = true;
-        foreach (var rule in rules)
-        {
-            if (!rule.IsCorrect(update))
-            {
-                isCorrect = false;
-                break;
-            }
-        }
-
-        return isCorrect;
     }
 
     [TestMethod]
