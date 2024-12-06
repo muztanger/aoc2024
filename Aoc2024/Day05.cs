@@ -7,8 +7,8 @@ public class Day05
 {
     class Rule
     {
-        int Left { init; get; }
-        int Right { init; get; }
+        internal int Left { init; get; }
+        internal int Right { init; get; }
 
         internal static Rule Parse(string line)
         {
@@ -91,13 +91,70 @@ public class Day05
     
     private static string Part2(IEnumerable<string> input)
     {
-        var result = new StringBuilder();
+        var result = 0;
+        var rules = new List<Rule>();
+        var updates = new List<Update>();
         foreach (var line in input)
         {
+            if (string.IsNullOrWhiteSpace(line))
+            {
+                continue;
+            }
+            if (line.Contains('|'))
+            {
+                var rule = Rule.Parse(line);
+                rules.Add(rule);
+            }
+            else if (line.Contains(','))
+            {
+                var update = Update.Parse(line);
+                updates.Add(update);
+            }
         }
+
+        foreach (var update in updates.Where((u) => !CheckRules(rules, u)))
+        {
+            var isChanged = true;
+            while (isChanged)
+            {
+                isChanged = false;
+                foreach (var rule in rules)
+                {
+                    if (rule.IsCorrect(update))
+                    {
+                        continue;
+                    }
+                    var leftIndex = update.Pages.IndexOf(rule.Left);
+                    var rightIndex = update.Pages.IndexOf(rule.Right);
+                    if (leftIndex > rightIndex)
+                    {
+                        update.Pages.Swap(leftIndex, rightIndex);
+                        isChanged = true;
+                        continue;
+                    }
+                }
+            }
+            result += update.Pages[update.Pages.Count / 2];
+        }
+
         return result.ToString();
     }
-    
+
+    private static bool CheckRules(List<Rule> rules, Update update)
+    {
+        var isCorrect = true;
+        foreach (var rule in rules)
+        {
+            if (!rule.IsCorrect(update))
+            {
+                isCorrect = false;
+                break;
+            }
+        }
+
+        return isCorrect;
+    }
+
     [TestMethod]
     public void Day05_Part1_Example01()
     {
@@ -136,16 +193,6 @@ public class Day05
     }
     
     [TestMethod]
-    public void Day05_Part1_Example02()
-    {
-        var input = """
-            <TODO>
-            """;
-        var result = Part1(Common.GetLines(input));
-        Assert.AreEqual("", result);
-    }
-    
-    [TestMethod]
     public void Day05_Part1()
     {
         var result = Part1(Common.DayInput(nameof(Day05), "2024"));
@@ -156,17 +203,34 @@ public class Day05
     public void Day05_Part2_Example01()
     {
         var input = """
-            <TODO>
-            """;
-        var result = Part2(Common.GetLines(input));
-        Assert.AreEqual("", result);
-    }
-    
-    [TestMethod]
-    public void Day05_Part2_Example02()
-    {
-        var input = """
-            <TODO>
+            47|53
+            97|13
+            97|61
+            97|47
+            75|29
+            61|13
+            75|53
+            29|13
+            97|29
+            53|29
+            61|53
+            97|53
+            61|29
+            47|13
+            75|47
+            97|75
+            47|61
+            75|61
+            47|29
+            75|13
+            53|13
+            
+            75,47,61,53,29
+            97,61,53,29,13
+            75,29,13
+            75,97,47,61,53
+            61,13,29
+            97,13,75,29,47
             """;
         var result = Part2(Common.GetLines(input));
         Assert.AreEqual("", result);
