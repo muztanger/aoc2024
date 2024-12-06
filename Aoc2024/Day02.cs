@@ -1,4 +1,5 @@
 using Advent_of_Code_2024.Commons;
+using Aoc2024.Commons;
 using System.Security.Cryptography;
 
 namespace Advent_of_Code_2024;
@@ -123,15 +124,14 @@ public class Day02
     public void Day02_Part2()
     {
         IEnumerable<string> input = Common.DayInput(nameof(Day02), "2024");
-        var timer = new System.Diagnostics.Stopwatch();
 
-        long mem = GC.GetTotalAllocatedBytes();
-        timer.Start();
+        var profiler = new Profiler();
+        profiler.Start();
+
         var result = Part2(input);
-        timer.Stop();
-        mem = GC.GetTotalAllocatedBytes() - mem;
-        Console.WriteLine($"Elapsed time: {timer.ElapsedMilliseconds} ms");
-        Console.WriteLine($"Allocated bytes: {mem / 1024.0:N2} kb");
+
+        profiler.Stop();
+        profiler.Print();
 
         // Enumerators/Linq
         //    There were 1000 lines.

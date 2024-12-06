@@ -1,3 +1,5 @@
+using Aoc2024.Commons;
+
 namespace Advent_of_Code_2024;
 
 [TestClass]
@@ -79,6 +81,9 @@ public class Day06
             }
             y++;
         }
+        var profiler = new Profiler();
+        profiler.Start();
+        var visited = new HashSet<(int, int, int)>() {};
         foreach (var newObstruction in box.GetPositions())
         {
             if (obstructions.Contains(newObstruction) || start == newObstruction)
@@ -88,33 +93,56 @@ public class Day06
 
             var directionIndex = 3;
             var pos = start;
-            var traversed = new HashSet<(Pos<int>, Pos<int>)>() {(pos, Pos<int>.CardinalDirections[directionIndex]) };
+            visited.Clear();
+            visited.Add((pos.x, pos.y, directionIndex));
+            var nextVisit = (0, 0, 0);
             while (box.Contains(pos))
             {
-                var nextPos = pos + Pos<int>.CardinalDirections[directionIndex];
-                if (!box.Contains(nextPos))
+                var nextPos2d = pos + Pos<int>.CardinalDirections[directionIndex];
+                nextVisit = (nextPos2d.x, nextPos2d.y, directionIndex);
+                if (!box.Contains(nextVisit))
                 {
                     break;
                 }
 
-                if (traversed.Contains((nextPos, Pos<int>.CardinalDirections[directionIndex])))
+                if (visited.Contains(nextVisit))
                 {
                     result++;
                     break;
                 }
 
-                if (obstructions.Contains(nextPos) || newObstruction == nextPos)
+                if (obstructions.Contains(nextPos2d) || newObstruction == nextPos2d)
                 {
                     directionIndex = (directionIndex + 1) % Pos<int>.CardinalDirections.Count;
                 }
                 else
                 {
-                    pos = nextPos;
-                    traversed.Add((pos, Pos<int>.CardinalDirections[directionIndex]));
+                    pos = nextPos2d;
+                    visited.Add(nextVisit);
                 }
             }
-
         }
+        profiler.Stop();
+        profiler.Print();
+
+        // TODO: Pretty absurd memory allocation
+        // 
+        // Inital implementation
+        //   Elapsed: 15705ms
+        //   Allocated memory: 8,032,079.74 kb
+        // 
+        // Using HashSet.Clear() instead of creating a new HashSet
+        //   Elapsed: 12631ms
+        //   Allocated memory: 1,774,714.77 kb
+        //
+        // Using Pos3 instead of (pos, direction)
+        //   Elapsed: 13848ms
+        //   Allocated memory: 4,138,966.30 kb
+        //
+        // Using tuple (pos.x, pos.y directionIndex) instead of (Pos, Pos) for visited
+        //   Elapsed: 11553ms (on battery)
+        //   Allocated memory: 1,774,233.66 kb
+
         return result.ToString();
 
     }

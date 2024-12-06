@@ -1,3 +1,4 @@
+using Aoc2024.Commons;
 using System.ComponentModel.DataAnnotations;
 
 namespace Advent_of_Code_2024;
@@ -239,8 +240,13 @@ public class Day05
     [TestMethod]
     public void Day05_Part2()
     {
+        var profiler = new Profiler();
+        profiler.Start();
         var result = Part2(Common.DayInput(nameof(Day05), "2024"));
+        profiler.Stop();
+
         Assert.AreEqual("6938", result);
+        profiler.Print();
     }
     
 }

@@ -48,28 +48,26 @@ public class Box<T> : IEquatable<Box<T>>
 
     public bool Contains(Pos<T> pos)
     {
-        if (pos.x < Min.x || pos.x > Max.x)
-        {
-            return false;
-        }
-        if (pos.y < Min.y || pos.y > Max.y)
-        {
-            return false;
-        }
-        return true;
+        return pos.x >= Min.x
+            && pos.x <= Max.x
+            && pos.y >= Min.y
+            && pos.y <= Max.y;
+    }
+
+    public bool Contains((T, T, T) tuple)
+    {
+        return tuple.Item1 >= Min.x
+            && tuple.Item1 <= Max.x
+            && tuple.Item2 >= Min.y
+            && tuple.Item2 <= Max.y;
     }
 
     public bool Contains(Box<T> box)
     {
-        if (box.Min.x < Min.x || box.Max.x > Max.x)
-        {
-            return false;
-        }
-        if (box.Min.y < Min.y || box.Max.y > Max.y)
-        {
-            return false;
-        }
-        return true;
+        return box.Min.x >= Min.x
+            && box.Max.x <= Max.x
+            && box.Min.y >= Min.y
+            && box.Max.y <= Max.y;
     }
 
     public IEnumerable<Pos<T>> GetPositions()
