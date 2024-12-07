@@ -1,3 +1,4 @@
+using Aoc2024.Commons;
 using System.Security.Cryptography;
 
 namespace Advent_of_Code_2024;
@@ -127,7 +128,18 @@ public class Day07
     [TestMethod]
     public void Day07_Part1()
     {
+        var profiler = new Profiler();
+        profiler.Start();
+
         var result = Part1(Common.DayInput(nameof(Day07), "2024"));
+
+        profiler.Stop();
+        profiler.Print();
+
+        // Initial solution
+        //    Elapsed: 103ms
+        //    Allocated memory: 56,961.92 kb
+
         Assert.AreEqual("3119088655389", result);
     }
     
@@ -152,7 +164,18 @@ public class Day07
     [TestMethod]
     public void Day07_Part2()
     {
+        var profiler = new Profiler();
+        profiler.Start();
+        
         var result = Part2(Common.DayInput(nameof(Day07), "2024"));
+        
+        profiler.Stop();
+        profiler.Print();
+
+        // Initial solution
+        //    Elapsed: 11838ms
+        //    Allocated memory: 4,546,470.98 kb
+
         Assert.AreEqual("264184041398847", result);
     }
     
