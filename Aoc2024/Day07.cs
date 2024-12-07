@@ -146,24 +146,14 @@ public class Day07
             292: 11 6 16 20
             """;
         var result = Part2(Common.GetLines(input));
-        Assert.AreEqual("", result);
-    }
-    
-    [TestMethod]
-    public void Day07_Part2_Example02()
-    {
-        var input = """
-            <TODO>
-            """;
-        var result = Part2(Common.GetLines(input));
-        Assert.AreEqual("", result);
+        Assert.AreEqual("11387", result);
     }
     
     [TestMethod]
     public void Day07_Part2()
     {
         var result = Part2(Common.DayInput(nameof(Day07), "2024"));
-        Assert.AreEqual("", result);
+        Assert.AreEqual("264184041398847", result);
     }
     
 }
