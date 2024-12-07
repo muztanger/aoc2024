@@ -56,14 +56,11 @@ public class Day07
     
     private static string Part2(IEnumerable<string> input)
     {
-        var stringOperations = new Dictionary<char, Func<long, long, string>>
-        {
-            ['|'] = (a, b) => $"{a}{b}",
-        };
-        var mathOperations = new Dictionary<char, Func<long, long, long>>
+        var operations = new Dictionary<char, Func<long, long, long>>
         {
             ['+'] = (a, b) => a + b,
             ['*'] = (a, b) => a * b,
+            ['|'] = (a, b) => long.Parse($"{a}{b}"),
         };
         var result = 0L;
         foreach (var line in input)
@@ -88,51 +85,10 @@ public class Day07
 
                 if (current.Length == numbers.Count - 1)
                 {
-                    var newNumbers = new List<long>();
-                    var queue = new Queue<long>();
+                    var sum = numbers[0];
                     for (var i = 1; i < numbers.Count; i++)
                     {
-                        if (current[i - 1] == '|')
-                        {
-                            queue.Enqueue(numbers[i - 1]);
-                        }
-                        else
-                        {
-                            if (queue.Any())
-                            {
-                                queue.Enqueue(numbers[i - 1]);
-                                var newNumber = new StringBuilder();
-                                while (queue.TryDequeue(out var x))
-                                {
-                                    newNumber.Append(x);
-                                }
-                                newNumbers.Add(long.Parse(newNumber.ToString()));
-                            }
-                            else
-                            {
-                                newNumbers.Add(numbers[i - 1]);
-                            }
-                        }
-                    }
-                    if (queue.Any())
-                    {
-                        queue.Enqueue(numbers[^1]);
-                        var newNumber = new StringBuilder();
-                        while (queue.TryDequeue(out var x))
-                        {
-                            newNumber.Append(x);
-                        }
-                        newNumbers.Add(long.Parse(newNumber.ToString()));
-                    }
-                    else
-                    {
-                        newNumbers.Add(numbers[^1]);
-                    }
-                    var newOperations = current.Where(x => x != '|').ToList();
-                    var sum = newNumbers[0];
-                    for (var i = 1; i < newNumbers.Count; i++)
-                    {
-                        sum += mathOperations[newOperations[i - 1]](sum, newNumbers[i]);
+                        sum = operations[current[i - 1]](sum, numbers[i]);
                     }
                     if (sum == answer)
                     {
