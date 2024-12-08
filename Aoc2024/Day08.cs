@@ -1,17 +1,14 @@
+using System.Linq;
+
 namespace Advent_of_Code_2024;
 
 [TestClass]
 public class Day08
 {
-    class Antenna
-    {
-        public char Frequency { get; set; }
-        required public Pos<int> Pos { get; set; }
-    }
 
     private static string Part1(IEnumerable<string> input)
     {
-        var antennas = new DefaultValueDictionary<char, List<Antenna>>(() => new List<Antenna>());
+        var antennas = new DefaultValueDictionary<char, List<Pos<int>>>(() => new List<Pos<int>>());
         var box = new Box<int>(1, 1);
         var row = 0;
         var occupied = new HashSet<Pos<int>>();
@@ -28,11 +25,7 @@ public class Day08
                 char frequency = line[col];
                 if (frequency != '.')
                 {
-                    antennas[frequency].Add(new Antenna()
-                    {
-                        Frequency = frequency,
-                        Pos = pos
-                    });
+                    antennas[frequency].Add(pos);
                     occupied.Add(pos);
                 }
                 box.IncreaseToPoint(pos);
@@ -43,57 +36,23 @@ public class Day08
         var antiNodes = new HashSet<Pos<int>>();
         foreach (var frequency in antennas.Keys)
         {
-            foreach (var a1 in antennas[frequency])
-            {
-                foreach (var a2 in antennas[frequency])
+            antennas[frequency].SelectMany((a1) => antennas[frequency].Select((a2) => (a1, a2)))
+                .Where((item) => item.a1 != item.a2)
+                .ToList()
+                .ForEach((item) =>
                 {
-                    if (a1.Pos == a2.Pos)
-                    {
-                        continue;
-                    }
-
-                    var dp = a2.Pos - a1.Pos;
-                    List<Pos<int>> positions = [a1.Pos - dp, a2.Pos + dp];
-                    foreach (var pos in positions)
-                    {
-                        if (box.Contains(pos))
-                        {
-                            antiNodes.Add(pos);
-                        }
-                    }
-                }
-            }
+                    var dp = item.a2 - item.a1;
+                    List<Pos<int>> positions = [item.a1 - dp, item.a2 + dp];
+                    positions.Where(box.Contains).ToList().ForEach((pos) => antiNodes.Add(pos));
+                });
         }
-
-        var result = new StringBuilder();
-        for (var y = 0; y <= box.Max.y; y++)
-        {
-            for (var x = 0; x <= box.Max.x; x++)
-            {
-                if (occupied.Contains(new Pos<int>(x, y)))
-                {
-                    result.Append('a');
-                }
-                else if (antiNodes.Contains(new Pos<int>(x, y)))
-                {
-                    result.Append('#');
-                }
-                else
-                {
-                    result.Append('.');
-                }
-            }
-            result.AppendLine();
-        }
-        Console.WriteLine(result.ToString());
-
 
         return antiNodes.Count.ToString();
     }
 
     private static string Part2(IEnumerable<string> input)
     {
-        var antennas = new DefaultValueDictionary<char, List<Antenna>>(() => new List<Antenna>());
+        var antennas = new DefaultValueDictionary<char, List<Pos<int>>>(() => new List<Pos<int>>());
         var box = new Box<int>(1, 1);
         var row = 0;
         var occupied = new HashSet<Pos<int>>();
@@ -110,11 +69,7 @@ public class Day08
                 char frequency = line[col];
                 if (frequency != '.')
                 {
-                    antennas[frequency].Add(new Antenna()
-                    {
-                        Frequency = frequency,
-                        Pos = pos
-                    });
+                    antennas[frequency].Add(pos);
                     occupied.Add(pos);
                 }
                 box.IncreaseToPoint(pos);
@@ -129,16 +84,15 @@ public class Day08
             {
                 foreach (var a2 in antennas[frequency])
                 {
-                    if (a1.Pos == a2.Pos)
+                    if (a1 == a2)
                     {
                         continue;
                     }
 
-                    var dp = a2.Pos - a1.Pos;
-                    List<Pos<int>> positions = [a1.Pos - dp, a2.Pos + dp];
+                    var dp = a2 - a1;
 
                     {
-                        var p = a1.Pos;
+                        var p = a1;
                         while (box.Contains(p))
                         {
                             antiNodes.Add(p);
@@ -146,7 +100,7 @@ public class Day08
                         }
                     }
                     {
-                        var p = a2.Pos;
+                        var p = a2;
                         while (box.Contains(p))
                         {
                             antiNodes.Add(p);
@@ -156,29 +110,6 @@ public class Day08
                 }
             }
         }
-
-        var result = new StringBuilder();
-        for (var y = 0; y <= box.Max.y; y++)
-        {
-            for (var x = 0; x <= box.Max.x; x++)
-            {
-                if (occupied.Contains(new Pos<int>(x, y)))
-                {
-                    result.Append('a');
-                }
-                else if (antiNodes.Contains(new Pos<int>(x, y)))
-                {
-                    result.Append('#');
-                }
-                else
-                {
-                    result.Append('.');
-                }
-            }
-            result.AppendLine();
-        }
-        Console.WriteLine(result.ToString());
-
 
         return antiNodes.Count.ToString();
     }
