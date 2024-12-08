@@ -36,15 +36,17 @@ public class Day08
         var antiNodes = new HashSet<Pos<int>>();
         foreach (var frequency in antennas.Keys)
         {
-            antennas[frequency].SelectMany((a1) => antennas[frequency].Select((a2) => (a1, a2)))
-                .Where((item) => item.a1 != item.a2)
-                .ToList()
-                .ForEach((item) =>
+            foreach (var item in antennas[frequency]
+                .SelectMany((a1) => antennas[frequency].Select((a2) => (a1, a2)))
+                .Where((item) => item.a1 != item.a2))
+            {
+                var dp = item.a2 - item.a1;
+                List<Pos<int>> positions = [item.a1 - dp, item.a2 + dp];
+                foreach (var pos in positions.Where(box.Contains))
                 {
-                    var dp = item.a2 - item.a1;
-                    List<Pos<int>> positions = [item.a1 - dp, item.a2 + dp];
-                    positions.Where(box.Contains).ToList().ForEach((pos) => antiNodes.Add(pos));
-                });
+                    antiNodes.Add(pos);
+                }
+            }
         }
 
         return antiNodes.Count.ToString();
@@ -90,17 +92,10 @@ public class Day08
                     }
 
                     var dp = a2 - a1;
+                    Harmonics(a1, -dp);
+                    Harmonics(a2, dp);
 
-                    {
-                        var p = a1;
-                        while (box.Contains(p))
-                        {
-                            antiNodes.Add(p);
-                            p -= dp;
-                        }
-                    }
-                    {
-                        var p = a2;
+                    void Harmonics(Pos<int> p, Pos<int> dp) {
                         while (box.Contains(p))
                         {
                             antiNodes.Add(p);

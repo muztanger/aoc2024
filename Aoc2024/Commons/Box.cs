@@ -25,6 +25,8 @@ public class Box<T> : IEquatable<Box<T>>
     public Box(T width, T height) :
         this(new Pos<T>(T.Zero, T.Zero), new Pos<T>(width - T.One, height - T.One))
     {
+        Assert.IsTrue(width > T.Zero);
+        Assert.IsTrue(height > T.Zero);
     }
 
     public Box(Box<T> other)
