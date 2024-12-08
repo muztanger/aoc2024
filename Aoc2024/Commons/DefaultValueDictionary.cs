@@ -14,6 +14,8 @@ public class DefaultValueDictionary<TKey, TValue> : IEnumerable<KeyValuePair<TKe
 
     public Dictionary<TKey, TValue> Inner => mDict;
 
+    public Dictionary<TKey, TValue> .KeyCollection Keys => mDict.Keys;
+
     public TValue this[TKey key]
     {
         get => GetValue(key);
@@ -45,6 +47,5 @@ public class DefaultValueDictionary<TKey, TValue> : IEnumerable<KeyValuePair<TKe
     {
         return mDict.GetEnumerator();
     }
-
 
 }
