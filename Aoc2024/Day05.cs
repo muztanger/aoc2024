@@ -48,11 +48,10 @@ public class Day05
         }
     }
 
-    private static string Part1(IEnumerable<string> input)
+    private static void ParseInput(IEnumerable<string> input, out List<Rule> rules, out List<Update> updates)
     {
-        var result = 0;
-        var rules = new List<Rule>();
-        var updates = new List<Update>();
+        rules = new List<Rule>();
+        updates = new List<Update>();
         foreach (var line in input)
         {
             if (string.IsNullOrWhiteSpace(line))
@@ -70,6 +69,12 @@ public class Day05
                 updates.Add(update);
             }
         }
+    }
+
+    private static string Part1(IEnumerable<string> input)
+    {
+        var result = 0;
+        ParseInput(input, out var rules, out var updates);
         foreach (var update in updates)
         {
             if (rules.All(r => r.IsCorrect(update)))
@@ -80,29 +85,11 @@ public class Day05
 
         return result.ToString();
     }
-    
+
     private static string Part2(IEnumerable<string> input)
     {
         var result = 0;
-        var rules = new List<Rule>();
-        var updates = new List<Update>();
-        foreach (var line in input)
-        {
-            if (string.IsNullOrWhiteSpace(line))
-            {
-                continue;
-            }
-            if (line.Contains('|'))
-            {
-                var rule = Rule.Parse(line);
-                rules.Add(rule);
-            }
-            else if (line.Contains(','))
-            {
-                var update = Update.Parse(line);
-                updates.Add(update);
-            }
-        }
+        ParseInput(input, out var rules, out var updates);
 
         foreach (var update in updates.Where((u) => rules.Any((r) => !r.IsCorrect(u))))
         {
