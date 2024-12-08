@@ -51,17 +51,6 @@ public class Day08
                     {
                         continue;
                     }
-                    // Example:
-                    // ....
-                    // ....
-                    // .12.
-                    //
-                    // a1.Pos = (1, 3)
-                    // a2.Pos = (2, 3)
-                    // dp = (2, 3) - (1, 3) = (1, 0)
-                    // a1 - dp, a2 + dp
-                    // positions = [(1, 3) + (1, 0), (1, 3) - (1, 0), (2, 3) + (1, 0), (2, 3) - (1, 0)]
-                    // positions = [(2, 3), (0, 3), (3, 3), (1, 3)]
 
                     var dp = a2.Pos - a1.Pos;
                     List<Pos<int>> positions = [a1.Pos - dp, a2.Pos + dp];
@@ -219,8 +208,8 @@ public class Day08
     public void Day08_Part1()
     {
         var result = Part1(Common.DayInput(nameof(Day08), "2024"));
-        Assert.AreNotEqual("540", result); // 540 is too high
-        Assert.AreEqual("", result);
+        Assert.AreNotEqual("540", result, "540 is too high");
+        Assert.AreEqual("269", result);
     }
     
     [TestMethod]
@@ -245,20 +234,10 @@ public class Day08
     }
     
     [TestMethod]
-    public void Day08_Part2_Example02()
-    {
-        var input = """
-            <TODO>
-            """;
-        var result = Part2(Common.GetLines(input));
-        Assert.AreEqual("", result);
-    }
-    
-    [TestMethod]
     public void Day08_Part2()
     {
         var result = Part2(Common.DayInput(nameof(Day08), "2024"));
-        Assert.AreEqual("", result);
+        Assert.AreEqual("949", result);
     }
     
 }
