@@ -15,11 +15,11 @@ public class Day09
             if (i % 2 == 0)
             {
                 var index = i / 2;
-                disk.AddRange(Enumerable.Range(0, diskmap[i]).Select(_ => index));
+                disk.AddRange(Enumerable.Repeat(index, diskmap[i]));
             }
             else
             {
-                disk.AddRange(Enumerable.Range(0, diskmap[i]).Select(_ => -1));
+                disk.AddRange(Enumerable.Repeat(-1, diskmap[i]));
             }
         }
         //PrintDisk();
@@ -44,6 +44,7 @@ public class Day09
             }
             return true;
         }
+
         for (var i = disk.Count - 1; i >= 0; i--)
         {
             if (disk[i] < 0) continue;
@@ -75,42 +76,40 @@ public class Day09
         var result = new StringBuilder();
         var diskmap = input.First().Select(c => int.Parse("" + c)).ToList();
         var disk = new List<int>();
-        var fileSizes = new List<(int, int)>();
-        var fi = 0;
+        var fileSizes = new List<(int index, int length)>();
+        var fileIndex = 0;
         for (var i = 0; i < diskmap.Count; i++)
         {
             if (i % 2 == 0)
             {
                 var index = i / 2;
-                disk.AddRange(Enumerable.Range(0, diskmap[i]).Select(_ => index));
-                fileSizes.Add((fi, diskmap[i]));
-                fi += diskmap[i];
+                
+                disk.AddRange(Enumerable.Repeat(index, diskmap[i]));
+                fileSizes.Add((fileIndex, diskmap[i]));
+                fileIndex += diskmap[i];
             }
             else
             {
-                disk.AddRange(Enumerable.Range(0, diskmap[i]).Select(_ => -1));
-                fi += diskmap[i];
+                disk.AddRange(Enumerable.Repeat(-1, diskmap[i]));
+                fileIndex += diskmap[i];
             }
         }
         PrintDisk();
         void PrintDisk() { 
             //Console.WriteLine(string.Join("", disk.Select(x => x < 0 ? x == -1 ? " " : " " : x.ToString()))); 
         }
-        
-        for (var k = fileSizes.Count - 1; k >=0; k--)
-        {
-            var fileIndex = fileSizes[k].Item1;
-            var fileLength = fileSizes[k].Item2;
 
+        foreach (var fs in fileSizes.OrderByDescending(xs => xs.index))
+        {
             foreach (var (start, length) in FindSpans())
             {
-                if (start > fileIndex) break;
-                if (length < fileLength) continue;
+                if (start > fs.index) break;
+                if (length < fs.length) continue;
 
-                for (var i = 0; i < fileLength; i++)
+                for (var i = 0; i < fs.length; i++)
                 {
-                    disk[start + i] = disk[fileIndex + i];
-                    disk[fileIndex + i] = -2;
+                    disk[start + i] = disk[fs.index + i];
+                    disk[fs.index + i] = -2;
                 }
 
                 PrintDisk();
