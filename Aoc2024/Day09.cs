@@ -69,27 +69,94 @@ public class Day09
     private static string Part2(IEnumerable<string> input)
     {
         var result = new StringBuilder();
-        foreach (var line in input)
+        var diskmap = input.First().Select(c => int.Parse("" + c)).ToList();
+        var disk = new List<int>();
+        var fileSizes = new List<(int, int)>();
+        var fi = 0;
+        for (var i = 0; i < diskmap.Count; i++)
         {
+            if (i % 2 == 0)
+            {
+                var index = i / 2;
+                disk.AddRange(Enumerable.Range(0, diskmap[i]).Select(_ => index));
+                fileSizes.Add((fi, diskmap[i]));
+                fi += diskmap[i];
+            }
+            else
+            {
+                disk.AddRange(Enumerable.Range(0, diskmap[i]).Select(_ => -1));
+                fi += diskmap[i];
+            }
         }
-        return result.ToString();
+        PrintDisk();
+        void PrintDisk() { 
+            //Console.WriteLine(string.Join("", disk.Select(x => x < 0 ? x == -1 ? " " : " " : x.ToString()))); 
+        }
+        
+        for (var k = fileSizes.Count - 1; k >=0; k--)
+        {
+            var fileIndex = fileSizes[k].Item1;
+            var fileLength = fileSizes[k].Item2;
+
+            foreach (var (start, length) in FindSpans())
+            {
+                if (start > fileIndex) break;
+                if (length < fileLength) continue;
+
+                for (var i = 0; i < fileLength; i++)
+                {
+                    disk[start + i] = disk[fileIndex + i];
+                    disk[fileIndex + i] = -2;
+                }
+
+                PrintDisk();
+                break;
+            }
+
+            List<(int start, int length)> FindSpans() {
+                var results = new List<(int start, int length)>();
+                var length = 0;
+                var spanStart = -1;
+                for (var i = 1; i < disk.Count; i++)
+                {
+                    if (disk[i] >= 0)
+                    {
+                        if (length > 0)
+                        {
+                            results.Add((spanStart, length));
+                            length = 0;
+                        }
+                    }
+                    else
+                    {
+                        if (length == 0)
+                        {
+                            spanStart = i;
+                        }
+                        length++;
+                    }
+                }
+                return results;
+            }
+        }
+
+        
+        PrintDisk();
+
+        long checksum = 0;
+        for (var i = 0; i < disk.Count; i++)
+        {
+            if (disk[i] < 0) continue;
+            checksum += disk[i] * i;
+        }
+        return checksum.ToString();
     }
-    
+
     [TestMethod]
     public void Day09_Part1_Example01()
     {
         var input = """
             2333133121414131402
-            """;
-        var result = Part1(Common.GetLines(input));
-        Assert.AreEqual("", result);
-    }
-    
-    [TestMethod]
-    public void Day09_Part1_Example02()
-    {
-        var input = """
-            <TODO>
             """;
         var result = Part1(Common.GetLines(input));
         Assert.AreEqual("", result);
@@ -106,20 +173,10 @@ public class Day09
     public void Day09_Part2_Example01()
     {
         var input = """
-            <TODO>
+            2333133121414131402
             """;
         var result = Part2(Common.GetLines(input));
-        Assert.AreEqual("", result);
-    }
-    
-    [TestMethod]
-    public void Day09_Part2_Example02()
-    {
-        var input = """
-            <TODO>
-            """;
-        var result = Part2(Common.GetLines(input));
-        Assert.AreEqual("", result);
+        Assert.AreEqual("2858", result);
     }
     
     [TestMethod]
