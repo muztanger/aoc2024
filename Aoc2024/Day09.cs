@@ -23,7 +23,11 @@ public class Day09
             }
         }
         //PrintDisk();
-        void PrintDisk() => Console.WriteLine(string.Join("", disk.Select(x => x < 0 ? x == -1 ? "." : "-" : x.ToString())));
+        void PrintDisk()
+        {
+            Console.WriteLine(string.Join("", disk.Select(x => x < 0 ? x == -1 ? "." : "-" : x.ToString())));
+        }
+
         bool IsCompact()
         {
             var flipCount = 0;
@@ -113,8 +117,7 @@ public class Day09
                 break;
             }
 
-            List<(int start, int length)> FindSpans() {
-                var results = new List<(int start, int length)>();
+            IEnumerable<(int, int)> FindSpans() {
                 var length = 0;
                 var spanStart = -1;
                 for (var i = 1; i < disk.Count; i++)
@@ -123,7 +126,7 @@ public class Day09
                     {
                         if (length > 0)
                         {
-                            results.Add((spanStart, length));
+                            yield return (spanStart, length);
                             length = 0;
                         }
                     }
@@ -136,7 +139,6 @@ public class Day09
                         length++;
                     }
                 }
-                return results;
             }
         }
 
@@ -159,14 +161,14 @@ public class Day09
             2333133121414131402
             """;
         var result = Part1(Common.GetLines(input));
-        Assert.AreEqual("", result);
+        Assert.AreEqual("1928", result);
     }
     
     [TestMethod]
     public void Day09_Part1()
     {
         var result = Part1(Common.DayInput(nameof(Day09), "2024"));
-        Assert.AreEqual("", result);
+        Assert.AreEqual("6367087064415", result);
     }
     
     [TestMethod]
@@ -183,7 +185,7 @@ public class Day09
     public void Day09_Part2()
     {
         var result = Part2(Common.DayInput(nameof(Day09), "2024"));
-        Assert.AreEqual("", result);
+        Assert.AreEqual("6390781891880", result);
     }
     
 }
