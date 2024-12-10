@@ -1,4 +1,5 @@
 using System;
+using Aoc2024.Commons;
 
 namespace Advent_of_Code_2024;
 
@@ -10,39 +11,36 @@ public class Day09
         var result = new StringBuilder();
         var diskmap = input.First().Select(c => int.Parse("" + c)).ToList();
         var disk = new List<int>();
+        var size = 0;
         for (var i = 0; i < diskmap.Count; i++)
         {
             if (i % 2 == 0)
             {
                 var index = i / 2;
                 disk.AddRange(Enumerable.Repeat(index, diskmap[i]));
+                size += diskmap[i];
             }
             else
             {
                 disk.AddRange(Enumerable.Repeat(-1, diskmap[i]));
             }
         }
-        //PrintDisk();
-        void PrintDisk()
-        {
-            Console.WriteLine(string.Join("", disk.Select(x => x < 0 ? x == -1 ? "." : "-" : x.ToString())));
-        }
 
+        var profiler = new Profiler();
+        profiler.Start();
+
+        var lastNonZero = disk.Count - 1;
         bool IsCompact()
         {
-            var flipCount = 0;
-            var sign = disk[0] >= 0;
-            for (var i = 1; i < disk.Count; i++)
+            for (int i = lastNonZero; i >= 0; i--)
             {
-                var sign2 = disk[i] >= 0;
-                if (sign != sign2)
+                if (disk[i] >= 0)
                 {
-                    flipCount++;
-                    sign = sign2;
+                    lastNonZero = i;
+                    break;
                 }
-                if (flipCount > 1) return false;
             }
-            return true;
+            return lastNonZero == (size - 1);
         }
 
         for (var i = disk.Count - 1; i >= 0; i--)
@@ -59,9 +57,9 @@ public class Day09
                 }
             }
         }
-        //PrintDisk();
-        //0099811188827773336446555566.............
-        //0099811188827773336446555566
+        profiler.Stop();
+        profiler.Print();
+
         long checksum = 0;
         for (var i = 0; i < disk.Count; i++)
         {
