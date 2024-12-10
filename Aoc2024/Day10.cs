@@ -5,7 +5,7 @@ public class Day10
 {
     class TrailHead
     {
-        public Pos<int> Pos { get; set; }
+        public required Pos<int> Pos { get; set; }
         public int Score { get; set; }
     }
 
@@ -73,7 +73,7 @@ public class Day10
             }
             head.Score = scorePoints.Count;
         }
-        Console.WriteLine(string.Join(", ", trailHeads.Select(x => x.Score)));
+
         result.Append(trailHeads.Sum(x => x.Score));
         return result.ToString();
     }
@@ -101,8 +101,8 @@ public class Day10
 
         foreach (var head in trailHeads)
         {
-            var stack = new Stack<(Pos<int> pos, int step, Pos<int> dir, string path)>();
-            var visited = new HashSet<(Pos<int> pos, Pos<int> dir, string path)>();
+            var stack = new Stack<(Pos<int> pos, int step, string path)>();
+            var visited = new HashSet<(Pos<int> pos, string path)>();
             foreach (var dir in Pos<int>.CardinalDirections)
             {
                 var newPos = head.Pos + dir;
@@ -110,26 +110,24 @@ public class Day10
                 var path = head.Pos.ToString() + ";";
                 if (box.Contains(newPos))
                 {
-                    stack.Push((newPos, newStep, dir, path));
+                    stack.Push((newPos, newStep, path));
                 }
             }
-            var scorePoints = new HashSet<Pos<int>>();
             while (stack.Count > 0)
             {
-                var (pos, step, dir, path) = stack.Pop();
-                if (visited.Contains((pos, dir, path)))
+                var (pos, step, path) = stack.Pop();
+                if (visited.Contains((pos, path)))
                 {
                     continue;
                 }
                 path += pos.ToString() + ";";
-                visited.Add((pos, dir, path));
+                visited.Add((pos, path));
                 if (grid[pos.y][pos.x] != step)
                 {
                     continue;
                 }
                 if (step == 9)
                 {
-                    scorePoints.Add(pos);
                     head.Score++;
                     continue;
                 }
@@ -139,13 +137,12 @@ public class Day10
                     var newStep = step + 1;
                     if (box.Contains(newPos))
                     {
-                        stack.Push((newPos, newStep, dp, path));
+                        stack.Push((newPos, newStep, path));
                     }
                 }
             }
-            //head.Score = scorePoints.Count;
         }
-        Console.WriteLine(string.Join(", ", trailHeads.Select(x => x.Score)));
+
         result.Append(trailHeads.Sum(x => x.Score));
         return result.ToString();
     }
@@ -203,7 +200,7 @@ public class Day10
     public void Day10_Part1()
     {
         var result = Part1(Common.DayInput(nameof(Day10), "2024"));
-        Assert.AreEqual("", result);
+        Assert.AreEqual("786", result);
     }
     
     [TestMethod]
@@ -242,7 +239,7 @@ public class Day10
     public void Day10_Part2()
     {
         var result = Part2(Common.DayInput(nameof(Day10), "2024"));
-        Assert.AreEqual("", result);
+        Assert.AreEqual("1722", result);
     }
     
 }
