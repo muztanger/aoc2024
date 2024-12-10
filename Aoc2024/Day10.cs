@@ -11,7 +11,6 @@ public class Day10
 
     private static string Part1(IEnumerable<string> input)
     {
-        var result = new StringBuilder();
         var grid = new List<List<int>>();
         var trailHeads = new List<TrailHead>();
         foreach (var line in input)
@@ -74,13 +73,11 @@ public class Day10
             head.Score = scorePoints.Count;
         }
 
-        result.Append(trailHeads.Sum(x => x.Score));
-        return result.ToString();
+        return trailHeads.Sum(x => x.Score).ToString();
     }
     
     private static string Part2(IEnumerable<string> input)
     {
-        var result = new StringBuilder();
         var grid = new List<List<int>>();
         var trailHeads = new List<TrailHead>();
         foreach (var line in input)
@@ -143,8 +140,7 @@ public class Day10
             }
         }
 
-        result.Append(trailHeads.Sum(x => x.Score));
-        return result.ToString();
+        return trailHeads.Sum(x => x.Score).ToString();
     }
     
     [TestMethod]
