@@ -81,9 +81,72 @@ public class Day10
     private static string Part2(IEnumerable<string> input)
     {
         var result = new StringBuilder();
+        var grid = new List<List<int>>();
+        var trailHeads = new List<TrailHead>();
         foreach (var line in input)
         {
+            var row = new List<int>();
+            foreach (var c in line)
+            {
+                int x = c == '.' ? -1 : int.Parse(c.ToString());
+                row.Add(x);
+                if (x == 0)
+                {
+                    trailHeads.Add(new TrailHead { Pos = new Pos<int>(row.Count - 1, grid.Count), Score = 0 });
+                }
+            }
+            grid.Add(row);
         }
+        var box = new Box<int>(grid[0].Count, grid.Count);
+
+        foreach (var head in trailHeads)
+        {
+            var stack = new Stack<(Pos<int> pos, int step, Pos<int> dir, string path)>();
+            var visited = new HashSet<(Pos<int> pos, Pos<int> dir, string path)>();
+            foreach (var dir in Pos<int>.CardinalDirections)
+            {
+                var newPos = head.Pos + dir;
+                var newStep = 1;
+                var path = head.Pos.ToString() + ";";
+                if (box.Contains(newPos))
+                {
+                    stack.Push((newPos, newStep, dir, path));
+                }
+            }
+            var scorePoints = new HashSet<Pos<int>>();
+            while (stack.Count > 0)
+            {
+                var (pos, step, dir, path) = stack.Pop();
+                if (visited.Contains((pos, dir, path)))
+                {
+                    continue;
+                }
+                path += pos.ToString() + ";";
+                visited.Add((pos, dir, path));
+                if (grid[pos.y][pos.x] != step)
+                {
+                    continue;
+                }
+                if (step == 9)
+                {
+                    scorePoints.Add(pos);
+                    head.Score++;
+                    continue;
+                }
+                foreach (var dp in Pos<int>.CardinalDirections)
+                {
+                    var newPos = pos + dp;
+                    var newStep = step + 1;
+                    if (box.Contains(newPos))
+                    {
+                        stack.Push((newPos, newStep, dp, path));
+                    }
+                }
+            }
+            //head.Score = scorePoints.Count;
+        }
+        Console.WriteLine(string.Join(", ", trailHeads.Select(x => x.Score)));
+        result.Append(trailHeads.Sum(x => x.Score));
         return result.ToString();
     }
     
@@ -147,20 +210,32 @@ public class Day10
     public void Day10_Part2_Example01()
     {
         var input = """
-            <TODO>
+            012345
+            123456
+            234567
+            345678
+            4.6789
+            56789.
             """;
         var result = Part2(Common.GetLines(input));
-        Assert.AreEqual("", result);
+        Assert.AreEqual("227", result);
     }
     
     [TestMethod]
     public void Day10_Part2_Example02()
     {
         var input = """
-            <TODO>
+            89010123
+            78121874
+            87430965
+            96549874
+            45678903
+            32019012
+            01329801
+            10456732
             """;
         var result = Part2(Common.GetLines(input));
-        Assert.AreEqual("", result);
+        Assert.AreEqual("81", result);
     }
     
     [TestMethod]
