@@ -6,12 +6,12 @@ public static class Common
         var baseDir = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "..", "..", "..", year == "2024" ? "" : year);
         var fileName = Path.Combine(baseDir, "Input", $"{day}.input");
 
-        Console.WriteLine($"Read from ${fileName}");
-
         if (!File.Exists(fileName))
         {
             using var fs = File.Create(fileName);
         }
+
+        Console.WriteLine($"Read from {Path.GetFullPath(fileName)}");
 
         int counter = 0;
         string? line;
