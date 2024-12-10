@@ -104,7 +104,7 @@ public class Day10
             {
                 var newPos = head.Pos + dir;
                 var newStep = 1;
-                var path = head.Pos.ToString() + ";";
+                var path = head.Pos.ToString();
                 if (box.Contains(newPos))
                 {
                     stack.Push((newPos, newStep, path));
@@ -117,7 +117,7 @@ public class Day10
                 {
                     continue;
                 }
-                path += pos.ToString() + ";";
+                path += pos.ToString();
                 visited.Add((pos, path));
                 if (grid[pos.y][pos.x] != step)
                 {
