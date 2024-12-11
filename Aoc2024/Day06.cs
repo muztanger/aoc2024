@@ -84,6 +84,7 @@ public class Day06
         var profiler = new Profiler();
         profiler.Start();
         var visited = new HashSet<(byte, byte, byte)>() {};
+        (byte, byte, byte) nextVisit = (0, 0, 0);
         foreach (var newObstruction in box.GetPositions())
         {
             if (obstructions.Contains(newObstruction) || start == newObstruction)
@@ -95,7 +96,6 @@ public class Day06
             var pos = start;
             visited.Clear();
             visited.Add((pos.x, pos.y, directionIndex));
-            (byte, byte, byte) nextVisit = (0, 0, 0);
             while (box.Contains(pos))
             {
                 var nextPos2d = pos + Pos<byte>.CardinalDirections[directionIndex];
