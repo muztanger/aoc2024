@@ -5,26 +5,21 @@ public class Day11
 {
     private static string Part1(IEnumerable<string> input)
     {
-        return Part(input, 25);
+        return Blinks(input, 25);
     }
 
     private static string Part2(IEnumerable<string> input)
     {
-        return Part(input, 75);
+        return Blinks(input, 75);
     }
 
-    private static string Part(IEnumerable<string> input, int N)
+    private static string Blinks(IEnumerable<string> input, int N)
     {
         var stones = new Dictionary<long, long>();
         foreach (var s in input.First().Split(' ').Select(long.Parse))
         {
             stones.TryGetValue(s, out var count);
             stones[s] = count + 1;
-        }
-
-        long StoneCount()
-        {
-            return stones.Sum(kv => kv.Value);
         }
 
         void Blink()
@@ -74,7 +69,7 @@ public class Day11
             Blink();
         }
 
-        return StoneCount().ToString();
+        return stones.Sum(kv => kv.Value).ToString();
     }
     
     [TestMethod]
@@ -83,7 +78,7 @@ public class Day11
         var input = """
             0 1 10 99 999
             """;
-        var result = Part(Common.GetLines(input), 1);
+        var result = Blinks(Common.GetLines(input), 1);
         Assert.AreEqual("7", result);
     }
     
