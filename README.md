@@ -19,7 +19,7 @@ Ideas on what to try out:
 | 7   | :star: :star: | 
 | 8   | :star: :star: |
 | 9   | :star: :star: |
-| 10  | |
+| 10  | :star: |
 | 11  | |
 | 12  | |
 | 13  | |
