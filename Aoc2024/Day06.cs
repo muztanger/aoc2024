@@ -8,24 +8,24 @@ public class Day06
     private static string Part1(IEnumerable<string> input)
     {
         var result = new StringBuilder();
-        var y = 0;
-        var start = new Pos<int>(0, 0);
-        var box = new Box<int>(start);
-        var obstructions = new List<Pos<int>>();
+        byte y = 0;
+        var start = new Pos<byte>(0, 0);
+        var box = new Box<byte>(start);
+        var obstructions = new List<Pos<byte>>();
         foreach (var line in input)
         {
             if (string.IsNullOrEmpty(line)) continue;
-            var x = 0;
+            byte x = 0;
             foreach (var c in line)
             {
                 if (c == '#')
                 {
-                    box.IncreaseToPoint(new Pos<int>(x, y));
-                    obstructions.Add(new Pos<int>(x, y));
+                    box.IncreaseToPoint(new Pos<byte>(x, y));
+                    obstructions.Add(new Pos<byte>(x, y));
                 }
                 else if (c == '^')
                 {
-                    start = new Pos<int>(x, y);
+                    start = new Pos<byte>(x, y);
                 }
                 x++;
             }
@@ -33,10 +33,10 @@ public class Day06
         }
         var directionIndex = 3;
         var pos = start;
-        var traversed = new List<Pos<int>>() { pos };
+        var traversed = new List<Pos<byte>>() { pos };
         while (box.Contains(pos))
         {
-            var nextPos = pos + Pos<int>.CardinalDirections[directionIndex];
+            var nextPos = pos + Pos<byte>.CardinalDirections[directionIndex];
             if (!box.Contains(nextPos))
             {
                 break;
@@ -58,24 +58,24 @@ public class Day06
     private static string Part2(IEnumerable<string> input)
     {
         var result = 0;
-        var y = 0;
-        var start = new Pos<int>(0, 0);
-        var box = new Box<int>(start);
-        var obstructions = new HashSet<Pos<int>>();
+        byte y = 0;
+        var start = new Pos<byte>(0, 0);
+        var box = new Box<byte>(start);
+        var obstructions = new HashSet<Pos<byte>>();
         foreach (var line in input)
         {
             if (string.IsNullOrEmpty(line)) continue;
-            var x = 0;
+            byte x = 0;
             foreach (var c in line)
             {
                 if (c == '#')
                 {
-                    box.IncreaseToPoint(new Pos<int>(x, y));
-                    obstructions.Add(new Pos<int>(x, y));
+                    box.IncreaseToPoint(new Pos<byte>(x, y));
+                    obstructions.Add(new Pos<byte>(x, y));
                 }
                 else if (c == '^')
                 {
-                    start = new Pos<int>(x, y);
+                    start = new Pos<byte>(x, y);
                 }
                 x++;
             }
@@ -83,7 +83,7 @@ public class Day06
         }
         var profiler = new Profiler();
         profiler.Start();
-        var visited = new HashSet<(int, int, int)>() {};
+        var visited = new HashSet<(byte, byte, byte)>() {};
         foreach (var newObstruction in box.GetPositions())
         {
             if (obstructions.Contains(newObstruction) || start == newObstruction)
@@ -91,14 +91,14 @@ public class Day06
                 continue;
             }
 
-            var directionIndex = 3;
+            byte directionIndex = 3;
             var pos = start;
             visited.Clear();
             visited.Add((pos.x, pos.y, directionIndex));
-            var nextVisit = (0, 0, 0);
+            (byte, byte, byte) nextVisit = (0, 0, 0);
             while (box.Contains(pos))
             {
-                var nextPos2d = pos + Pos<int>.CardinalDirections[directionIndex];
+                var nextPos2d = pos + Pos<byte>.CardinalDirections[directionIndex];
                 nextVisit = (nextPos2d.x, nextPos2d.y, directionIndex);
                 if (!box.Contains(nextVisit))
                 {
@@ -113,7 +113,7 @@ public class Day06
 
                 if (obstructions.Contains(nextPos2d) || newObstruction == nextPos2d)
                 {
-                    directionIndex = (directionIndex + 1) % Pos<int>.CardinalDirections.Count;
+                    directionIndex = (byte) ( (directionIndex + 1) % Pos<byte>.CardinalDirections.Count);
                 }
                 else
                 {
@@ -142,6 +142,10 @@ public class Day06
         // Using tuple (pos.x, pos.y directionIndex) instead of (Pos, Pos) for visited
         //   Elapsed: 11553ms (on battery)
         //   Allocated memory: 1,774,233.66 kb
+        //
+        // Using bytes for state instead of ints and HashSet
+        //   Elapsed: 12938ms
+        //   Allocated memory: 1,774,030.96 kb
 
         return result.ToString();
 
