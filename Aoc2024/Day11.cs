@@ -3,174 +3,73 @@ namespace Advent_of_Code_2024;
 [TestClass]
 public class Day11
 {
-    class Stone
-    {
-        public long Number { get; set; }
-        public Stone? Left { get; set; }
-        public Stone? Right { get; set; }
-
-        public override string ToString() => $"{Left?.Number}<{Number}>{Right?.Number}";
-    }
-
     private static string Part1(IEnumerable<string> input)
     {
-        var stones = input.First().Split(' ').Select(x => new Stone { Number = long.Parse(x)}).ToArray();
-        for (var i = 0; i < stones.Length; i++)
-        {
-            if (i > 0) stones[i].Left = stones[i - 1];
-            if (i < stones.Length - 1) stones[i].Right = stones[i + 1];
-        }
-
-        string StoneString()
-        {
-            var result = new StringBuilder();
-            var stone = stones.First();
-            while (stone is not null)
-            {
-                if (result.Length != 0)
-                {
-                    result.Append(' ');
-                }
-                result.Append(stone.Number);
-                stone = stone.Right;
-            }
-            return result.ToString();
-        }
-
-        int StoneCount()
-        {
-            var count = 0;
-            var stone = stones.First();
-            while (stone is not null)
-            {
-                count++;
-                stone = stone.Right;
-            }
-            return count;
-        }
-
-        void Blink()
-        {
-            var stone = stones.First();
-
-            while (stone is not null)
-            {
-                // 0 changes to 1
-                if (stone.Number == 0)
-                {
-                    stone.Number = 1;
-                    stone = stone.Right;
-                    continue;
-                }
-
-                // even number of digits -> "first half of digits", "second half of digits" (leeding zeros are removed)
-                var digits = stone.Number.ToString().ToCharArray();
-                if (digits.Length % 2 == 0)
-                {
-                    var half = digits.Length / 2;
-                    var firstHalf = long.Parse(new string(digits.AsSpan(0, half)));
-                    var secondHalf = long.Parse(new string(digits.AsSpan(half)));
-                    stone.Number = firstHalf;
-
-                    var newStone = new Stone { Number = secondHalf, Left = stone, Right = stone.Right };
-                    if (stone.Right is not null)
-                    {
-                        stone.Right.Left = newStone;
-                    }
-                    stone.Right = newStone;
-
-                    stone = newStone.Right;
-                    continue;
-                }
-                stone.Number *= 2024;
-                stone = stone.Right;
-            }
-        }
-
-        for (var i = 0; i < 25; i++)
-        {
-            Blink();
-        }
-
-        return StoneCount().ToString();
+        return Part(input, 25);
     }
-    
+
     private static string Part2(IEnumerable<string> input)
     {
-        var stones = input.First().Split(' ').Select(x => new Stone { Number = long.Parse(x) }).ToArray();
-        for (var i = 0; i < stones.Length; i++)
+        return Part(input, 75);
+    }
+
+    private static string Part(IEnumerable<string> input, int N)
+    {
+        var stones = new Dictionary<long, long>();
+        foreach (var s in input.First().Split(' ').Select(long.Parse))
         {
-            if (i > 0) stones[i].Left = stones[i - 1];
-            if (i < stones.Length - 1) stones[i].Right = stones[i + 1];
+            stones.TryGetValue(s, out var count);
+            stones[s] = count + 1;
         }
 
-        string StoneString()
+        long StoneCount()
         {
-            var result = new StringBuilder();
-            var stone = stones.First();
-            while (stone is not null)
-            {
-                if (result.Length != 0)
-                {
-                    result.Append(' ');
-                }
-                result.Append(stone.Number);
-                stone = stone.Right;
-            }
-            return result.ToString();
-        }
-
-        int StoneCount()
-        {
-            var count = 0;
-            var stone = stones.First();
-            while (stone is not null)
-            {
-                count++;
-                stone = stone.Right;
-            }
-            return count;
+            return stones.Sum(kv => kv.Value);
         }
 
         void Blink()
         {
-            var stone = stones.First();
-
-            while (stone is not null)
+            var nextStones = new Dictionary<long, long>();
+            foreach (var (stone, count) in stones)
             {
                 // 0 changes to 1
-                if (stone.Number == 0)
+                if (stone == 0)
                 {
-                    stone.Number = 1;
-                    stone = stone.Right;
+                    nextStones.TryGetValue(1, out var x);
+                    nextStones[1] = x + count;
                     continue;
                 }
 
                 // even number of digits -> "first half of digits", "second half of digits" (leeding zeros are removed)
-                var digits = stone.Number.ToString().ToCharArray();
+                var digits = stone.ToString().ToCharArray();
                 if (digits.Length % 2 == 0)
                 {
                     var half = digits.Length / 2;
                     var firstHalf = long.Parse(new string(digits.AsSpan(0, half)));
                     var secondHalf = long.Parse(new string(digits.AsSpan(half)));
-                    stone.Number = firstHalf;
 
-                    var newStone = new Stone { Number = secondHalf, Left = stone, Right = stone.Right };
-                    if (stone.Right is not null)
                     {
-                        stone.Right.Left = newStone;
+                        nextStones.TryGetValue(firstHalf, out var x);
+                        nextStones[firstHalf] = x + count;
                     }
-                    stone.Right = newStone;
-
-                    stone = newStone.Right;
+                    {
+                        nextStones.TryGetValue(secondHalf, out var x);
+                        nextStones[secondHalf] = x + count;
+                    }
                     continue;
                 }
-                stone.Number *= 2024;
-                stone = stone.Right;
+
+                // else multiply by 2024
+                {
+                    nextStones.TryGetValue(stone * 2024, out var x);
+                    nextStones[stone * 2024] = x + count;
+                }
             }
+
+            stones = nextStones;
         }
 
-        for (var i = 0; i < 75; i++)
+        for (var i = 0; i < N; i++)
         {
             Blink();
         }
@@ -184,8 +83,8 @@ public class Day11
         var input = """
             0 1 10 99 999
             """;
-        var result = Part1(Common.GetLines(input));
-        Assert.AreEqual("", result);
+        var result = Part(Common.GetLines(input), 1);
+        Assert.AreEqual("7", result);
     }
     
     [TestMethod]
@@ -202,34 +101,14 @@ public class Day11
     public void Day11_Part1()
     {
         var result = Part1(Common.DayInput(nameof(Day11), "2024"));
-        Assert.AreEqual("", result);
-    }
-    
-    [TestMethod]
-    public void Day11_Part2_Example01()
-    {
-        var input = """
-            <TODO>
-            """;
-        var result = Part2(Common.GetLines(input));
-        Assert.AreEqual("", result);
-    }
-    
-    [TestMethod]
-    public void Day11_Part2_Example02()
-    {
-        var input = """
-            <TODO>
-            """;
-        var result = Part2(Common.GetLines(input));
-        Assert.AreEqual("", result);
+        Assert.AreEqual("220999", result);
     }
     
     [TestMethod]
     public void Day11_Part2()
     {
         var result = Part2(Common.DayInput(nameof(Day11), "2024"));
-        Assert.AreEqual("", result);
+        Assert.AreEqual("261936432123724", result);
     }
     
 }
