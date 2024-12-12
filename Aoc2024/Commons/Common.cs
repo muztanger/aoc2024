@@ -1,8 +1,13 @@
-﻿namespace Advent_of_Code_2024.Commons;
+﻿using Aoc2024.Commons;
+
+namespace Advent_of_Code_2024.Commons;
 public static class Common
 {
     public static IEnumerable<string> DayInput(string day, string year = "2024")
     {
+        var profiler = new Profiler();
+        profiler.Start();
+
         var baseDir = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "..", "..", "..", year == "2024" ? "" : year);
         var fileName = Path.Combine(baseDir, "Input", $"{day}.input");
 
@@ -24,7 +29,10 @@ public static class Common
             counter++;
         }
 
+        profiler.Stop();
+
         Console.WriteLine("There were {0} lines.", counter);
+        profiler.Print("Reading file stats");
     }
 
     public static IEnumerable<string> GetLines(string input)

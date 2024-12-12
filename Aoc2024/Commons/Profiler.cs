@@ -25,8 +25,12 @@ namespace Aoc2024.Commons
             mem = GC.GetTotalAllocatedBytes() - mem;
         }
 
-        public void Print()
+        public void Print(string title = "")
         {
+            if (!string.IsNullOrEmpty(title))
+            {
+                Console.WriteLine(title);
+            }
             Console.WriteLine($"Elapsed: {timer.ElapsedMilliseconds}ms");
             Console.WriteLine($"Allocated memory: {mem / 1024.0:N2} kb");
         }
