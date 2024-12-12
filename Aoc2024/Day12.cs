@@ -1,4 +1,5 @@
 ﻿
+using Aoc2024.Commons;
 using System.Linq;
 
 namespace Advent_of_Code_2024;
@@ -50,9 +51,10 @@ public class Day12
 
             // find all the perimeters
             var perimeters = new HashSet<Pos<int>>();
+            var compassDirections = Pos<int>.CompassDirections;
             foreach (var pos in zoomed)
             {
-                foreach (var dp in Pos<int>.CompassDirections)
+                foreach (var dp in compassDirections)
                 {
                     var newPos = pos + dp;
                     if (!zoomed.Contains(newPos))
@@ -91,13 +93,13 @@ public class Day12
 
             // find all corners
             var corners = new HashSet<Pos<int>>();
+            var cardinalDirections = Pos<int>.CardinalDirections.ToArray();
             foreach (var pos in perimeters)
             {
-                var directions = Pos<int>.CardinalDirections.ToArray();
-                for (int i = 0; i < directions.Length; i++)
+                for (int i = 0; i < cardinalDirections.Length; i++)
                 {
-                    var j = (i + 1) % directions.Length;
-                    if (perimeters.Contains(pos + directions[i]) && perimeters.Contains(pos + directions[j]))
+                    var j = (i + 1) % cardinalDirections.Length;
+                    if (perimeters.Contains(pos + cardinalDirections[i]) && perimeters.Contains(pos + cardinalDirections[j]))
                     {
                         corners.Add(pos);
                         break;
@@ -121,7 +123,9 @@ public class Day12
 
     private static string Part(IEnumerable<string> input, int part)
     {
-        var result = new StringBuilder();
+        var profiler = new Profiler();
+        profiler.Start();
+
         var grid = new List<List<char>>();
         foreach (var line in input)
         {
@@ -167,11 +171,15 @@ public class Day12
             regions.Add(region);
         }
 
-        if (part == 1)
-        {
-            return regions.Sum(r => r.Perimeter() * r.Area()).ToString();
-        }
-        return regions.Sum(r => r.Sides() * r.Area()).ToString();
+
+        string result = part == 1 ?
+            regions.Sum(r => r.Perimeter() * r.Area()).ToString() : 
+            regions.Sum(r => r.Sides() * r.Area()).ToString();
+        
+        profiler.Stop();
+        profiler.Print("Part:");
+
+        return result;
     }
 
     [TestMethod]
