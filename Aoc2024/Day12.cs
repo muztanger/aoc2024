@@ -62,8 +62,7 @@ public class Day12
                 }
             }
 
-            {
-                // print perimeter
+            void PrintPerimeter() {
                 Console.WriteLine($"Perimeter for plant '{Plant}'");
                 var box = new Box<int>(perimeters.ToArray());
                 for (var y = box.Min.y; y <= box.Max.y; y++)
@@ -253,7 +252,7 @@ public class Day12
             OOOOO
             """;
         var result = Part1(Common.GetLines(input));
-        Assert.AreEqual("", result);
+        Assert.AreEqual("772", result);
     }
 
     [TestMethod]
@@ -272,7 +271,7 @@ public class Day12
             MMMISSJEEE
             """;
         var result = Part1(Common.GetLines(input));
-        Assert.AreEqual("", result);
+        Assert.AreEqual("1930", result);
     }
 
     [TestMethod]
@@ -348,7 +347,7 @@ public class Day12
     {
         var result = Part2(Common.DayInput(nameof(Day12), "2024"));
         Assert.AreNotEqual("892054", result); // too low
-        Assert.AreEqual("", result);
+        Assert.AreEqual("897062", result);
     }
     
 }
