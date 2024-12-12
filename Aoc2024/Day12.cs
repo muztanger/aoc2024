@@ -1,4 +1,4 @@
-
+﻿
 using System.Linq;
 
 namespace Advent_of_Code_2024;
@@ -64,7 +64,7 @@ public class Day12
 
             void PrintPerimeter() {
                 Console.WriteLine($"Perimeter for plant '{Plant}'");
-                var box = new Box<int>(perimeters.ToArray());
+                var box = new Box<int>(perimeters);
                 for (var y = box.Min.y; y <= box.Max.y; y++)
                 {
                     for (var x = box.Min.x; x <= box.Max.x; x++)
@@ -72,21 +72,22 @@ public class Day12
                         var pos = new Pos<int>(x, y);
                         if (perimeters.Contains(pos))
                         {
-                            Console.Write('p');
+                            Console.Write('■');
                         }
                         else if (zoomed.Contains(pos))
                         {
-                            Console.Write('o');
+                            Console.Write('□');
                         }
                         else
                         {
-                            Console.Write('.');
+                            Console.Write(' ');
                         }
                     }
                     Console.WriteLine();
                 }
                 Console.WriteLine();
             }
+            //PrintPerimeter();
 
             // find all corners
             var corners = new HashSet<Pos<int>>();
