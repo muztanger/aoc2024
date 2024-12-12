@@ -1,4 +1,6 @@
-﻿namespace Advent_of_Code_2024.Commons;
+﻿using System.Runtime.CompilerServices;
+
+namespace Advent_of_Code_2024.Commons;
 
 public class Box<T> : IEquatable<Box<T>>
     where T : INumber<T>
@@ -11,11 +13,24 @@ public class Box<T> : IEquatable<Box<T>>
     public T Area => Width * Height;
     public Pos<T> Size => new(Width, Height);
 
+    [Obsolete("Use the constructor with IEnumerable<Pos<T>> instead")]
     public Box(params Pos<T>[] positions)
     {
         Assert.IsTrue(positions.Length > 0);
         Min = new Pos<T>(positions[0]);
         Max = new Pos<T>(positions[0]);
+        foreach (var p in positions)
+        {
+            IncreaseToPoint(p);
+        }
+    }
+
+    [OverloadResolutionPriority(1)]
+    public Box(params IEnumerable<Pos<T>> positions)
+    {
+        Assert.IsTrue(positions.Any());
+        Min = new Pos<T>(positions.First());
+        Max = new Pos<T>(positions.First());
         foreach (var p in positions)
         {
             IncreaseToPoint(p);
