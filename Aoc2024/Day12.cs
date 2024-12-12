@@ -88,23 +88,6 @@ public class Day12
                 Console.WriteLine();
             }
 
-            // inner corners: 5 compass neighbors
-            //   pppppp
-            //   pppppp
-            //   ppnnnp
-            //   ppnooo
-            //   ppnooo
-            //   pppooo
-            //
-            // outer corners: 1 compass neighbor
-            //   oooooo
-            //   oooooo
-            //   oooooo
-            //   ooonpp
-            //   oooppp
-            //   oooppp
-
-
             // find all corners
             var corners = new HashSet<Pos<int>>();
             foreach (var pos in perimeters)
@@ -127,56 +110,15 @@ public class Day12
 
     private static string Part1(IEnumerable<string> input)
     {
-        var result = new StringBuilder();
-        var grid = new List<List<char>>();
-        foreach (var line in input)
-        {
-            grid.Add(line.ToList());
-        }
-        var box = new Box<int>(grid[0].Count, grid.Count);
-
-        var visited = new HashSet<Pos<int>>();
-        var regions = new List<Region>();
-
-        var stack = new Stack<Pos<int>>();
-        while (visited.Count < box.Area)
-        {
-            var pos = box.GetPositions().First(p => !visited.Contains(p));
-            var region = new Region { Plant = grid[pos.y][pos.x] };
-
-            stack.Push(pos);
-            while (stack.Count > 0)
-            {
-                pos = stack.Pop();
-                if (visited.Contains(pos))
-                {
-                    continue;
-                }
-
-                if (region.Plant != grid[pos.y][pos.x])
-                {
-                    continue;
-                }
-                visited.Add(pos);
-
-                region.Positions.Add(pos);
-
-                foreach (var dir in Pos<int>.CardinalDirections)
-                {
-                    var newPos = pos + dir;
-                    if (box.Contains(newPos) && !visited.Contains(newPos))
-                    {
-                        stack.Push(newPos);
-                    }
-                }
-            }
-            regions.Add(region);
-        }
-
-        return regions.Sum(r => r.Perimeter() * r.Area()).ToString();
+        return Part(input, 1);
     }
-    
+
     private static string Part2(IEnumerable<string> input)
+    {
+        return Part(input, 2);
+    }
+
+    private static string Part(IEnumerable<string> input, int part)
     {
         var result = new StringBuilder();
         var grid = new List<List<char>>();
@@ -223,9 +165,12 @@ public class Day12
             }
             regions.Add(region);
         }
-        Console.WriteLine(regions.Count);
-        Console.WriteLine(string.Join("\n", regions.Select(r => $"{r.Plant}: Area={r.Area()} Sides={r.Sides()}")));
-        return regions.Sum(r => (long) r.Sides() * r.Area()).ToString();
+
+        if (part == 1)
+        {
+            return regions.Sum(r => r.Perimeter() * r.Area()).ToString();
+        }
+        return regions.Sum(r => r.Sides() * r.Area()).ToString();
     }
 
     [TestMethod]
