@@ -62,6 +62,33 @@ public class Day12
                 }
             }
 
+            {
+                // print perimeter
+                Console.WriteLine($"Perimeter for plant '{Plant}'");
+                var box = new Box<int>(perimeters.ToArray());
+                for (var y = box.Min.y; y <= box.Max.y; y++)
+                {
+                    for (var x = box.Min.x; x <= box.Max.x; x++)
+                    {
+                        var pos = new Pos<int>(x, y);
+                        if (perimeters.Contains(pos))
+                        {
+                            Console.Write('p');
+                        }
+                        else if (zoomed.Contains(pos))
+                        {
+                            Console.Write('o');
+                        }
+                        else
+                        {
+                            Console.Write('.');
+                        }
+                    }
+                    Console.WriteLine();
+                }
+                Console.WriteLine();
+            }
+
             // inner corners: 5 compass neighbors
             //   pppppp
             //   pppppp
@@ -83,18 +110,15 @@ public class Day12
             var corners = new HashSet<Pos<int>>();
             foreach (var pos in perimeters)
             {
-                var count = 0;
-                foreach (var dp in Pos<int>.CompassDirections)
+                var directions = Pos<int>.CardinalDirections.ToArray();
+                for (int i = 0; i < directions.Length; i++)
                 {
-                    var newPos = pos + dp;
-                    if (zoomed.Contains(newPos))
+                    var j = (i + 1) % directions.Length;
+                    if (perimeters.Contains(pos + directions[i]) && perimeters.Contains(pos + directions[j]))
                     {
-                        count++;
+                        corners.Add(pos);
+                        break;
                     }
-                }
-                if (count == 1 || count == 5)
-                {
-                    corners.Add(pos);
                 }
             }
 
@@ -201,7 +225,7 @@ public class Day12
             regions.Add(region);
         }
         Console.WriteLine(regions.Count);
-        Console.WriteLine(string.Join("\n", regions.Select(r => $"{r.Plant}: {r.Area()}")));
+        Console.WriteLine(string.Join("\n", regions.Select(r => $"{r.Plant}: Area={r.Area()} Sides={r.Sides()}")));
         return regions.Sum(r => (long) r.Sides() * r.Area()).ToString();
     }
 
