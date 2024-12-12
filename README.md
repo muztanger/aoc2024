@@ -8,31 +8,31 @@ Ideas on what to try out:
 - [x] ReadOnlySpan in my PosN implementation
 
 ## Progress
-| Day | Finished      |
-|-----|---------------|
-| 1   | :star: :star: |
-| 2   | :star: :star: |
-| 3   | :star: :star: |
-| 4   | :star: :star: |
-| 5   | :star: :star: |
-| 6   | :star: :star: |
-| 7   | :star: :star: | 
-| 8   | :star: :star: |
-| 9   | :star: :star: |
-| 10  | :star: :star: |
-| 11  | :star: :star: |
-| 12  | :star: :star: |
-| 13  | |
-| 14  | |
-| 15  | |
-| 16  | |
-| 17  | |
-| 18  | |
-| 19  | |
-| 20  | |
-| 21  | |
-| 22  | |
-| 23  | |
-| 24  | |
-| 25  | |
+| Day | Finished      | Aggregated execution time |
+|-----|---------------|----------------------|
+| 1   | :star: :star: | 50 ms|
+| 2   | :star: :star: | 111 ms|
+| 3   | :star: :star: | 119 ms|
+| 4   | :star: :star: | 186 ms|
+| 5   | :star: :star: | 253 ms|
+| 6   | :star: :star: | 19.6 s|
+| 7   | :star: :star: | 37.1 s|
+| 8   | :star: :star: | 37.1 s|
+| 9   | :star: :star: | 45.4 s|
+| 10  | :star: :star: | 45.6 s|
+| 11  | :star: :star: | 45.7 s|
+| 12  | :star: :star: | 47.9 s|
+| 13  | ||
+| 14  | ||
+| 15  | ||
+| 16  | ||
+| 17  | ||
+| 18  | ||
+| 19  | ||
+| 20  | ||
+| 21  | ||
+| 22  | ||
+| 23  | ||
+| 24  | ||
+| 25  | ||
 
