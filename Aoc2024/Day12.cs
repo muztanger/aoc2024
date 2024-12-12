@@ -1,3 +1,6 @@
+
+using System.Linq;
+
 namespace Advent_of_Code_2024;
 
 [TestClass]
@@ -28,6 +31,74 @@ public class Day12
         public int Area()
         {
             return Positions.Count;
+        }
+
+        internal int Sides()
+        {
+            // make a 3x3 square of each pos in Positions to avoid "corner" cases
+            var zoomed = new HashSet<Pos<int>>();
+            const int zoom = 3;
+            foreach (var pos in Positions) {
+
+                var pNew = pos * zoom;
+                var box = new Box<int>(zoom, zoom);
+                foreach (var dp in box.GetPositions())
+                {
+                    zoomed.Add(pNew + dp);
+                }
+            }
+
+            // find all the perimeters
+            var perimeters = new HashSet<Pos<int>>();
+            foreach (var pos in zoomed)
+            {
+                foreach (var dp in Pos<int>.CompassDirections)
+                {
+                    var newPos = pos + dp;
+                    if (!zoomed.Contains(newPos))
+                    {
+                        perimeters.Add(newPos);
+                    }
+                }
+            }
+
+            // inner corners: 5 compass neighbors
+            //   pppppp
+            //   pppppp
+            //   ppnnnp
+            //   ppnooo
+            //   ppnooo
+            //   pppooo
+            //
+            // outer corners: 1 compass neighbor
+            //   oooooo
+            //   oooooo
+            //   oooooo
+            //   ooonpp
+            //   oooppp
+            //   oooppp
+
+
+            // find all corners
+            var corners = new HashSet<Pos<int>>();
+            foreach (var pos in perimeters)
+            {
+                var count = 0;
+                foreach (var dp in Pos<int>.CompassDirections)
+                {
+                    var newPos = pos + dp;
+                    if (zoomed.Contains(newPos))
+                    {
+                        count++;
+                    }
+                }
+                if (count == 1 || count == 5)
+                {
+                    corners.Add(pos);
+                }
+            }
+
+            return corners.Count;
         }
     }
 
@@ -85,12 +156,55 @@ public class Day12
     private static string Part2(IEnumerable<string> input)
     {
         var result = new StringBuilder();
+        var grid = new List<List<char>>();
         foreach (var line in input)
         {
+            grid.Add(line.ToList());
         }
-        return result.ToString();
+        var box = new Box<int>(grid[0].Count, grid.Count);
+
+        var visited = new HashSet<Pos<int>>();
+        var regions = new List<Region>();
+
+        var stack = new Stack<Pos<int>>();
+        while (visited.Count < box.Area)
+        {
+            var pos = box.GetPositions().First(p => !visited.Contains(p));
+            var region = new Region { Plant = grid[pos.y][pos.x] };
+
+            stack.Push(pos);
+            while (stack.Count > 0)
+            {
+                pos = stack.Pop();
+                if (visited.Contains(pos))
+                {
+                    continue;
+                }
+
+                if (region.Plant != grid[pos.y][pos.x])
+                {
+                    continue;
+                }
+                visited.Add(pos);
+
+                region.Positions.Add(pos);
+
+                foreach (var dir in Pos<int>.CardinalDirections)
+                {
+                    var newPos = pos + dir;
+                    if (box.Contains(newPos) && !visited.Contains(newPos))
+                    {
+                        stack.Push(newPos);
+                    }
+                }
+            }
+            regions.Add(region);
+        }
+        Console.WriteLine(regions.Count);
+        Console.WriteLine(string.Join("\n", regions.Select(r => $"{r.Plant}: {r.Area()}")));
+        return regions.Sum(r => (long) r.Sides() * r.Area()).ToString();
     }
-    
+
     [TestMethod]
     public void Day12_Part1_Example01()
     {
@@ -141,33 +255,75 @@ public class Day12
     public void Day12_Part1()
     {
         var result = Part1(Common.DayInput(nameof(Day12), "2024"));
-        Assert.AreEqual("", result);
+        Assert.AreEqual("1483212", result);
     }
     
     [TestMethod]
     public void Day12_Part2_Example01()
     {
         var input = """
-            <TODO>
+            AAAA
+            BBCD
+            BBCC
+            EEEC
             """;
         var result = Part2(Common.GetLines(input));
-        Assert.AreEqual("", result);
+        Assert.AreEqual("80", result);
     }
     
     [TestMethod]
     public void Day12_Part2_Example02()
     {
         var input = """
-            <TODO>
+            EEEEE
+            EXXXX
+            EEEEE
+            EXXXX
+            EEEEE
             """;
         var result = Part2(Common.GetLines(input));
-        Assert.AreEqual("", result);
+        Assert.AreEqual("236", result);
     }
-    
+
+    [TestMethod]
+    public void Day12_Part2_Example03()
+    {
+        var input = """
+            AAAAAA
+            AAABBA
+            AAABBA
+            ABBAAA
+            ABBAAA
+            AAAAAA
+            """;
+        var result = Part2(Common.GetLines(input));
+        Assert.AreEqual("368", result);
+    }
+
+    [TestMethod]
+    public void Day12_Part2_Example04()
+    {
+        var input = """
+            RRRRIICCFF
+            RRRRIICCCF
+            VVRRRCCFFF
+            VVRCCCJFFF
+            VVVVCJJCFE
+            VVIVCCJJEE
+            VVIIICJJEE
+            MIIIIIJJEE
+            MIIISIJEEE
+            MMMISSJEEE
+            """;
+        var result = Part2(Common.GetLines(input));
+        Assert.AreEqual("1206", result);
+    }
+
     [TestMethod]
     public void Day12_Part2()
     {
         var result = Part2(Common.DayInput(nameof(Day12), "2024"));
+        Assert.AreNotEqual("892054", result); // too low
         Assert.AreEqual("", result);
     }
     
