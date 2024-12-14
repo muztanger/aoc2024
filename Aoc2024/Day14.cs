@@ -5,13 +5,20 @@ public class Day14
 {
     class Robot
     {
+        public required int Id;
         public Pos<int> Position;
         public Pos<int> Velocity;
+
+        public string PosString()
+        {
+            return $"({Id}:{Position})";
+        }
     }
 
     private static string Part1(IEnumerable<string> input, Box<int> space)
     {
         var robots = new List<Robot>();
+        var id = 0;
         foreach (var line in input)
         {
             var match = Regex.Match(line, @"p=(-?\d+),(-?\d+) v=(-?\d+),(-?\d+)");
@@ -19,6 +26,7 @@ public class Day14
             {
                 robots.Add(new Robot()
                 {
+                    Id = id++,
                     Position = new Pos<int>(int.Parse(match.Groups[1].Value), int.Parse(match.Groups[2].Value)),
                     Velocity = new Pos<int>(int.Parse(match.Groups[3].Value), int.Parse(match.Groups[4].Value))
                 });
@@ -102,6 +110,7 @@ public class Day14
     private static string Part2(IEnumerable<string> input, Box<int> space)
     {
         var robots = new List<Robot>();
+        int id = 0;
         foreach (var line in input)
         {
             var match = Regex.Match(line, @"p=(-?\d+),(-?\d+) v=(-?\d+),(-?\d+)");
@@ -109,11 +118,14 @@ public class Day14
             {
                 robots.Add(new Robot()
                 {
+                    Id = id++,
                     Position = new Pos<int>(int.Parse(match.Groups[1].Value), int.Parse(match.Groups[2].Value)),
                     Velocity = new Pos<int>(int.Parse(match.Groups[3].Value), int.Parse(match.Groups[4].Value))
                 });
             }
         }
+        var initialRobots = new List<Robot>(robots.Select(r => new Robot() { Position = r.Position, Id = r.Id, Velocity = r.Velocity}));
+
         void Move()
         {
             foreach (var robot in robots)
@@ -181,53 +193,75 @@ public class Day14
             var quadrant = new Box<int>(new Pos<int>(x, y), new Pos<int>(x + width - 1, y + height - 1));
             quadrants.Add(quadrant);
         }
-
-        var seconds = 0;
-        for(;;)
+        string RobotsString()
         {
-            Move();
-            seconds++;
-            // check quadrant counts
-            var counts = new List<int>();
-            foreach (var quadrant in quadrants)
+            var result = new StringBuilder();
+            foreach (var robot in robots)
             {
-                var count = robots.Count(r => quadrant.Contains(r.Position));
-                counts.Add(count);
+                result.Append(robot.PosString());
             }
-            if (counts[0] != counts[1] || counts[2] != counts[3])
-            {
-                continue;
-            }
+            return result.ToString();
+        }
+        var visited = new HashSet<string>
+        {
+            RobotsString()
+        };
 
-            // check for mirror symmetry
-            var isSymmetric = true;
-            Parallel.For(space.Min.y, space.Max.y + 1, (y, state) =>
+        // create a template tree of positions
+        var template = new HashSet<Pos<int>>();
+        var center = space.Width / 2;
+        template.Add(new Pos<int>(center, 0));
+        for (int y = 1; y <= Math.Min(space.Max.y, space.Max.x / 2); y++)
+        {
+            template.Add(new Pos<int>(center, y));
+            for (int dx = 1; dx <= y; dx++)
             {
-                for (var x = space.Min.x; x <= space.Max.x / 2; x++)
-                {
-                    var pos = new Pos<int>(x, y);
-                    var value = robots.Any(r => r.Position == pos);
-                    if (value == true)
-                    {
-                        var mirrorPos = new Pos<int>(space.Max.x - x, y);
-                        var mirrorValue = robots.Any(r => r.Position == mirrorPos);
-                        if (value != mirrorValue)
-                        {
-                            isSymmetric = false;
-                            state.Break();
-                        }
-                    }
-                }
-            });
-            if (isSymmetric) {
-                Console.WriteLine(seconds);
-                var robotsString = ToString();
-                Console.WriteLine(robotsString);
-                break;
+                template.Add(new Pos<int>(center + dx, y));
+                template.Add(new Pos<int>(center - dx, y));
             }
         }
+        var templateBox = new Box<int>(template);
 
-        return seconds.ToString();
+        var seconds = 0;
+        for (int dy = 0; dy <= space.Height - templateBox.Height; dy++)
+        {
+            var dyPos = new Pos<int>(0, dy);
+            robots = new List<Robot>(initialRobots.Select(r => new Robot() { Position = r.Position, Id = r.Id, Velocity = r.Velocity }));
+            seconds = 0;
+            visited.Clear();
+
+            while(true)
+            {
+                Move();
+                seconds++;
+
+                if (!visited.Add(RobotsString()))
+                {
+                    // Loop detected
+                    Console.WriteLine($"Loop detected after {seconds} seconds. dy={dy}");
+                    break;
+                }
+
+                var templateCount = 0;
+                Parallel.ForEach(robots, robot =>
+                {
+                    if (template.Contains(robot.Position + dyPos))
+                    {
+                        Interlocked.Increment(ref templateCount);
+                    }
+                });
+                if (templateCount > robots.Count * 2 / 3)
+                {
+                    var robotsString = ToString();
+                    Console.WriteLine(seconds);
+                    Console.WriteLine(robotsString);
+                    return seconds.ToString();
+                }
+            }
+
+        }
+
+        return (-1).ToString();
     }
 
 
@@ -256,7 +290,7 @@ public class Day14
     public void Day14_Part1()
     {
         var result = Part1(Common.DayInput(nameof(Day14), "2024"), new Box<int>(101, 103));
-        Assert.AreEqual("", result);
+        Assert.AreEqual("221142636", result);
     }
     
    
@@ -264,7 +298,7 @@ public class Day14
     public void Day14_Part2()
     {
         var result = Part2(Common.DayInput(nameof(Day14), "2024"), new Box<int>(101, 103));
-        Assert.AreEqual("", result);
+        Assert.AreEqual("7916", result);
     }
     
 }
