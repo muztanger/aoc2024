@@ -6,8 +6,8 @@ public class Day14
     class Robot
     {
         public required int Id;
-        public Pos<int> Position;
-        public Pos<int> Velocity;
+        public required Pos<int> Position;
+        public required Pos<int> Velocity;
 
         public string PosString()
         {
