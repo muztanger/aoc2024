@@ -10,7 +10,7 @@ Ideas on what to try out:
 ## Progress
 | Day | Finished      | Aggregated execution time |
 |-----|---------------|----------------------|
-| 1   | :star: :star: | 50 ms|
+| 1   | :star: :star: | 50 ms |
 | 2   | :star: :star: | 111 ms|
 | 3   | :star: :star: | 119 ms|
 | 4   | :star: :star: | 186 ms|
@@ -22,8 +22,8 @@ Ideas on what to try out:
 | 10  | :star: :star: | 45.6 s|
 | 11  | :star: :star: | 45.7 s|
 | 12  | :star: :star: | 47.9 s|
-| 13  | :star: :star: ||
-| 14  | :star: :star:||
+| 13  | :star: :star: | 49.4 s|
+| 14  | :star: :star: | 51.6 s|
 | 15  | ||
 | 16  | ||
 | 17  | ||
