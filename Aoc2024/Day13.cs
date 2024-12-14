@@ -11,6 +11,18 @@ public class Day13
 
         public bool TryFindMinimumCostToPrize(out long cost)
         {
+            // a c + b d = X
+            // a e + b f = Y
+            //
+            //Button A: X+94, Y+34
+            //Button B: X + 22, Y + 67
+            //Prize: X = 8400, Y = 5400
+            //
+            // a * 94 + b * 22 = 8400
+            // a * 34 + b * 67 = 5400
+            //
+
+
             cost = long.MaxValue;
             Pos<long> start = new(0, 0);
             var box = new Box<long>(start, Price);
