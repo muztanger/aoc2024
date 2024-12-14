@@ -141,8 +141,7 @@ public class Day14
                 }
             }
         }
-
-        void Print()
+        string ToString()
         {
             var result = new StringBuilder();
 
@@ -163,29 +162,72 @@ public class Day14
                 }
                 result.AppendLine();
             }
-            Console.WriteLine(result.ToString());
+            return result.ToString();
+        }
+
+        void Print()
+        {
+            Console.WriteLine(ToString());
             Console.WriteLine();
         }
 
-        for (int i = 0; i < 200; i++)
-        {
-            Move();
-            Print();
-        }
-
-        var safetyFactor = 1;
+        int width = space.Width / 2;
+        int height = space.Height / 2;
+        var quadrants = new List<Box<int>>();
         foreach (var dq in new Box<int>(2, 2).GetPositions())
         {
-            var width = space.Width / 2;
-            var height = space.Height / 2;
             int x = dq.x * width + dq.x;
             int y = dq.y * height + dq.y;
             var quadrant = new Box<int>(new Pos<int>(x, y), new Pos<int>(x + width - 1, y + height - 1));
-            var count = robots.Count(r => quadrant.Contains(r.Position));
-            safetyFactor *= count;
+            quadrants.Add(quadrant);
         }
 
-        return safetyFactor.ToString();
+        var seconds = 0;
+        for(;;)
+        {
+            Move();
+            seconds++;
+            // check quadrant counts
+            var counts = new List<int>();
+            foreach (var quadrant in quadrants)
+            {
+                var count = robots.Count(r => quadrant.Contains(r.Position));
+                counts.Add(count);
+            }
+            if (counts[0] != counts[1] || counts[2] != counts[3])
+            {
+                continue;
+            }
+
+            // check for mirror symmetry
+            var isSymmetric = true;
+            Parallel.For(space.Min.y, space.Max.y + 1, (y, state) =>
+            {
+                for (var x = space.Min.x; x <= space.Max.x / 2; x++)
+                {
+                    var pos = new Pos<int>(x, y);
+                    var value = robots.Any(r => r.Position == pos);
+                    if (value == true)
+                    {
+                        var mirrorPos = new Pos<int>(space.Max.x - x, y);
+                        var mirrorValue = robots.Any(r => r.Position == mirrorPos);
+                        if (value != mirrorValue)
+                        {
+                            isSymmetric = false;
+                            state.Break();
+                        }
+                    }
+                }
+            });
+            if (isSymmetric) {
+                Console.WriteLine(seconds);
+                var robotsString = ToString();
+                Console.WriteLine(robotsString);
+                break;
+            }
+        }
+
+        return seconds.ToString();
     }
 
 
