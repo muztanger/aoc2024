@@ -5,60 +5,41 @@ public class Day13
 {
     class ClawMachine
     {
-        public Pos<long> ButtonA;
-        public Pos<long> ButtonB;
-        public Pos<long> Price;
+        public required Pos<long> ButtonA;
+        public required Pos<long> ButtonB;
+        public required Pos<long> Price;
 
         public bool TryFindMinimumCostToPrize(out long cost)
         {
-            // a c + b d = X
-            // a e + b f = Y
-            //
-            //Button A: X+94, Y+34
-            //Button B: X + 22, Y + 67
-            //Prize: X = 8400, Y = 5400
-            //
-            // a * 94 + b * 22 = 8400
-            // a * 34 + b * 67 = 5400
-            //
+            // Math!
+            // Two equations and two unknowns
+            // B = y_p * x_a - x_p * y_a / (x_a * y_b - x_b * y_a)
+            // A = (x_p - x_b * B) / x_a
 
-
-            cost = long.MaxValue;
-            Pos<long> start = new(0, 0);
-            var box = new Box<long>(start, Price);
-            var visited = new HashSet<(Pos<long> pos, long cost)>();
-
-
-            var queue = new PriorityQueue<(Pos<long> pos, long cost), long>();
-            queue.Enqueue((start, 0), 0);
-            var isFound = false;
-            while (queue.Count > 0)
+            BigInteger B_upper = BigInteger.Multiply(Price.y, ButtonA.x) - BigInteger.Multiply(Price.x, ButtonA.y);
+            BigInteger B_lower = BigInteger.Multiply(ButtonA.x, ButtonB.y) - BigInteger.Multiply(ButtonB.x, ButtonA.y);
+            BigInteger.DivRem(B_upper, B_lower, out var B_reminder);
+            if (B_reminder != BigInteger.Zero)
             {
-                var (pos, currentCost) = queue.Dequeue();
-                if (pos == Price)
-                {
-                    isFound = true;
-                    cost = Math.Min(cost, currentCost);
-                    continue;
-                }
-
-                if (visited.Contains((pos, currentCost))) continue;
-                visited.Add((pos, currentCost));
-
-                if (currentCost >= cost) continue;
-
-                if (box.Contains(pos + ButtonA))
-                {
-                    queue.Enqueue((pos + ButtonA, currentCost + 3), currentCost + 3);
-                }
-
-                if (box.Contains(pos + ButtonB))
-                {
-                    queue.Enqueue((pos + ButtonB, currentCost + 1), currentCost + 1);
-                }
+                cost = 0;
+                return false;
             }
 
-            return isFound;
+            BigInteger B = B_upper / B_lower;
+
+            BigInteger A_upper = Price.x - BigInteger.Multiply(ButtonB.x, B);
+            BigInteger.DivRem(A_upper, ButtonA.x, out var A_reminder);
+            if (A_reminder != BigInteger.Zero)
+            {
+                cost = 0;
+                return false;
+            }
+
+            BigInteger A = A_upper / ButtonA.x;
+
+            cost = (long)(A * 3 + B * 1);
+
+            return true;
         }
 
         override public string ToString() => $"ButtonA: {ButtonA}, ButtonB: {ButtonB}, Price: {Price}";
@@ -167,16 +148,6 @@ public class Day13
     }
     
     [TestMethod]
-    public void Day13_Part1_Example02()
-    {
-        var input = """
-            <TODO>
-            """;
-        var result = Part1(Common.GetLines(input));
-        Assert.AreEqual("", result);
-    }
-    
-    [TestMethod]
     public void Day13_Part1()
     {
         var result = Part1(Common.DayInput(nameof(Day13), "2024"));
@@ -204,24 +175,14 @@ public class Day13
             Prize: X=18641, Y=10279
             """;
         var result = Part2(Common.GetLines(input));
-        Assert.AreEqual("", result);
-    }
-    
-    [TestMethod]
-    public void Day13_Part2_Example02()
-    {
-        var input = """
-            <TODO>
-            """;
-        var result = Part2(Common.GetLines(input));
-        Assert.AreEqual("", result);
+        Assert.AreEqual("875318608908", result); // well, I assume this is correct
     }
     
     [TestMethod]
     public void Day13_Part2()
     {
         var result = Part2(Common.DayInput(nameof(Day13), "2024"));
-        Assert.AreEqual("", result);
+        Assert.AreEqual("102255878088512", result);
     }
     
 }
