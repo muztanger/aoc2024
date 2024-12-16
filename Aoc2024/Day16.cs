@@ -211,17 +211,33 @@ public class Day16
     public void Day16_Part1_Example02()
     {
         var input = """
-            <TODO>
+            #################
+            #...#...#...#..E#
+            #.#.#.#.#.#.#.#.#
+            #.#.#.#...#...#.#
+            #.#.#.#.###.#.#.#
+            #...#.#.#.....#.#
+            #.#.#.#.#.#####.#
+            #.#...#.#.#.....#
+            #.#.#####.#.###.#
+            #.#.#.......#...#
+            #.#.###.#####.###
+            #.#.#...#.....#.#
+            #.#.#.#####.###.#
+            #.#.#.........#.#
+            #.#.#.#########.#
+            #S#.............#
+            #################
             """;
         var result = Part1(Common.GetLines(input));
-        Assert.AreEqual("", result);
+        Assert.AreEqual("11048", result);
     }
     
     [TestMethod]
     public void Day16_Part1()
     {
         var result = Part1(Common.DayInput(nameof(Day16), "2024"));
-        Assert.AreEqual("", result);
+        Assert.AreEqual("66404", result);
     }
     
     [TestMethod]
@@ -278,7 +294,7 @@ public class Day16
     public void Day16_Part2()
     {
         var result = Part2(Common.DayInput(nameof(Day16), "2024"));
-        Assert.AreEqual("", result);
+        Assert.AreEqual("433", result);
     }
     
 }
