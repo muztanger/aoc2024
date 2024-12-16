@@ -24,8 +24,8 @@ Ideas on what to try out:
 | 12  | :star: :star: | 47.9 s|
 | 13  | :star: :star: | 49.4 s|
 | 14  | :star: :star: | 51.6 s|
-| 15  | ||
-| 16  | ||
+| 15  | :star: :star: | 54.4 s|
+| 16  | :star: :star: | 1.2 min|
 | 17  | ||
 | 18  | ||
 | 19  | ||
