@@ -362,32 +362,14 @@ public class Day15
             v^^>>><<^^<>>^v^<v^vv<>v^<<>^<^v^v><^<<<><<^<v><v<>vv>>v><v^<vv<>v^<<^
             """;
         var result = Part2(Common.GetLines(input));
-        Assert.AreEqual("", result);
-    }
-    
-    [TestMethod]
-    public void Day15_Part2_Example02()
-    {
-        var input = """
-            #######
-            #...#.#
-            #.....#
-            #..OO@#
-            #..O..#
-            #.....#
-            #######
-
-            <vv<<^^<<^^
-            """;
-        var result = Part2(Common.GetLines(input));
-        Assert.AreEqual("", result);
+        Assert.AreEqual("9021", result);
     }
     
     [TestMethod]
     public void Day15_Part2()
     {
         var result = Part2(Common.DayInput(nameof(Day15), "2024"));
-        Assert.AreEqual("", result);
+        Assert.AreEqual("1548815", result);
     }
     
 }
