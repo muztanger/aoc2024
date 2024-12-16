@@ -118,6 +118,7 @@ public class Day16
             }
         }
         var box = new Box<int>(grid[0].Count, grid.Count);
+        var minPosCost = new DefaultValueDictionary<(Pos<int>, int dir), int>(() => int.MaxValue);
 
         var result = new HashSet<Pos<int>>();
         var visited = new HashSet<string>();
@@ -130,16 +131,21 @@ public class Day16
             {
                 continue;
             }
+            if (minPosCost[(pos, dir)] < cost)
+            {
+                continue;
+            }
+            minPosCost[(pos, dir)] = cost;
             if (pos == end)
             {
                 path.ForEach(p => result.Add(p));
             }
-            string pathString = ComputeHash(string.Concat(path));
-            if (visited.Contains(pathString))
+            var visitedItem = ComputeHash(string.Concat(path));
+            if (visited.Contains(visitedItem))
             {
                 continue;
             }
-            visited.Add(pathString);
+            visited.Add(visitedItem);
 
             {
                 // turn left
