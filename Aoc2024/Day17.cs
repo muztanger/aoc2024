@@ -23,84 +23,92 @@ public class Day17
             }
         }
         Console.WriteLine(string.Join(", ", program));
-        return Part(program, registerA);
+        return Part(program.ToArray(), registerA);
     }
-    private static string Part(List<int> program, int registerA)
+    private static string Part(int[] program, long registerA, bool checkStartWith = false)
     {
         var result = new StringBuilder();
-        var registers = new Dictionary<char, long>
+        var registers = new long[]
         {
-            ['A'] = registerA,
-            ['B'] = 0,
-            ['C'] = 0
+            registerA,
+            0,
+            0
         };
 
         var instructionPointer = 0;
         var hasJumped = false;
-
-        var operations = new Dictionary<int, Action>
+        var outputIndex = 0;
+        var operations = new Action[]
         {
             // adv
-            { 0, () => {
-                registers['A'] = registers['A'] / (long) Math.Pow(2, ComboOperandValue(program[instructionPointer + 1]));
-            } },
+            () => {
+                
+                long x = Math.Min(ComboOperandValue(program[instructionPointer + 1]), 32);
+                registers[0] = registers[0] >> (int) x;
+            },
             
             // bxl
-            { 1, () => {
-                registers['B'] ^= program[instructionPointer + 1];
-            } },
+            () => {
+                registers[1] ^= program[instructionPointer + 1];
+            },
 
             // bst
-            { 2, () => { 
-                registers['B'] = ComboOperandValue(program[instructionPointer + 1]) & 0b111;
-            } },
+            () => { 
+                registers[1] = ComboOperandValue(program[instructionPointer + 1]) & 0b111;
+            },
 
             // jnz
-            { 3, () => { 
-                if (registers['A'] != 0)
+            () => { 
+                if (registers[0] != 0)
                 {
                     instructionPointer = program[instructionPointer + 1];
                     hasJumped = true;
                 }
-            } },
+            },
 
             // bxc
-            { 4, () => {
-                registers['B'] ^= registers['C'];
-            } },
+            () => {
+                registers[1] ^= registers[2];
+            },
 
             // out
-            { 5, () => { 
+            () => { 
+                var value = ComboOperandValue(program[instructionPointer + 1]) & 0b111;
+                if (checkStartWith && (outputIndex >= program.Length || program[outputIndex] != value))
+                {
+                    instructionPointer = program.Length;
+                }
                 if (result.Length > 0)
                 {
                     result.Append(',');
                 }
-                result.Append(ComboOperandValue(program[instructionPointer + 1]) & 0b111);
-            } },
+                result.Append(value);
+                outputIndex++;
+            },
 
             // bdv
-            { 6, () => {
-                registers['B'] = registers['A'] / (long) Math.Pow(2, ComboOperandValue(program[instructionPointer + 1]));
-            } },
+            () => {
+                registers[1] = registers[0] >> (int) Math.Min(ComboOperandValue(program[instructionPointer + 1]), 32);
+            },
 
             // cdv
-            { 7, () => { 
-                registers['C'] = registers['A'] / (long) Math.Pow(2, ComboOperandValue(program[instructionPointer + 1]));
-            } },
+            () => { 
+                registers[2] = registers[0] >> (int) Math.Min(ComboOperandValue(program[instructionPointer + 1]), 32);
+            },
         };
 
         long ComboOperandValue(int operand) => operand switch
         {
             >= 0 and <= 3 => operand,
-            4 => registers['A'],
-            5 => registers['B'],
-            6 => registers['C'],
+            4 => registers[0],
+            5 => registers[1],
+            6 => registers[2],
             _ => throw new InvalidOperationException($"Unknown operand {operand}")
         };
 
         for (;;)
         {
-            if (instructionPointer > program.Count - 1)
+            if (instructionPointer > program.Length - 1)
             {
                 // program halts
                 break;
@@ -121,11 +129,40 @@ public class Day17
     
     private static string Part2(IEnumerable<string> input)
     {
-        var result = new StringBuilder();
+        var program = new List<int>();
+        var registerA = 0;
         foreach (var line in input)
         {
+            if (line.Contains("Register A"))
+            {
+                var match = Regex.Match(line, @"Register (\w): (\d+)");
+                var value = int.Parse(match.Groups[2].Value);
+                registerA = value;
+            }
+            else if (line.Contains("Program"))
+            {
+                program = line.Substring("Program: ".Length).Split(',').Select(int.Parse).ToList();
+            }
         }
-        return result.ToString();
+        string programString = string.Join(",", program);
+        //Console.WriteLine($"programString={programString}");
+        //100_000_000
+        int[] programArray = program.ToArray();
+        long minResult = long.MaxValue;
+        var pResult = Parallel.For(0L, long.MaxValue, new ParallelOptions() { MaxDegreeOfParallelism = 6 }, (i, state) =>
+        {
+            var result = Part(programArray, i, checkStartWith: true);
+            if (result == programString)
+            {
+                minResult = Math.Min(i, minResult);
+                state.Break();
+            }
+        });
+        if (minResult < long.MaxValue)
+        {
+            return minResult.ToString();
+        }
+        return "Not found";
     }
     
     [TestMethod]
@@ -143,16 +180,6 @@ public class Day17
     }
     
     [TestMethod]
-    public void Day17_Part1_Example02()
-    {
-        var input = """
-            <TODO>
-            """;
-        var result = Part1(Common.GetLines(input));
-        Assert.AreEqual("", result);
-    }
-    
-    [TestMethod]
     public void Day17_Part1()
     {
         var result = Part1(Common.DayInput(nameof(Day17), "2024"));
@@ -163,20 +190,14 @@ public class Day17
     public void Day17_Part2_Example01()
     {
         var input = """
-            <TODO>
+            Register A: 2024
+            Register B: 0
+            Register C: 0
+
+            Program: 0,3,5,4,3,0
             """;
         var result = Part2(Common.GetLines(input));
-        Assert.AreEqual("", result);
-    }
-    
-    [TestMethod]
-    public void Day17_Part2_Example02()
-    {
-        var input = """
-            <TODO>
-            """;
-        var result = Part2(Common.GetLines(input));
-        Assert.AreEqual("", result);
+        Assert.AreEqual("117440", result);
     }
     
     [TestMethod]
