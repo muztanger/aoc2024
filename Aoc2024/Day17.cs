@@ -7,25 +7,33 @@ public class Day17
 {
     private static string Part1(IEnumerable<string> input)
     {
-        var registers = new Dictionary<char, long>();
         var program = new List<int>();
-        var result = new StringBuilder();
+        var registerA = 0;
         foreach (var line in input)
         {
-            if (line.Contains("Register"))
+            if (line.Contains("Register A"))
             {
                 var match = Regex.Match(line, @"Register (\w): (\d+)");
-                var register = match.Groups[1].Value[0];
                 var value = int.Parse(match.Groups[2].Value);
-                registers[register] = value;
+                registerA = value;
             }
             else if (line.Contains("Program"))
             {
                 program = line.Substring("Program: ".Length).Split(',').Select(int.Parse).ToList();
             }
         }
-        Console.WriteLine(string.Join(", ", registers.Select(kv => $"{kv.Key}: {kv.Value}")));
         Console.WriteLine(string.Join(", ", program));
+        return Part(program, registerA);
+    }
+    private static string Part(List<int> program, int registerA)
+    {
+        var result = new StringBuilder();
+        var registers = new Dictionary<char, long>
+        {
+            ['A'] = registerA,
+            ['B'] = 0,
+            ['C'] = 0
+        };
 
         var instructionPointer = 0;
         var hasJumped = false;
@@ -34,30 +42,21 @@ public class Day17
         {
             // adv
             { 0, () => {
-                // numenator is value of register A
-                // The denominator is found by raising 2 to the power of the instruction's combo operand.
-                // The result of the division operation is truncated to an integer and then written to the A register.
                 registers['A'] = registers['A'] / (long) Math.Pow(2, ComboOperandValue(program[instructionPointer + 1]));
             } },
             
             // bxl
             { 1, () => {
-                // The bxl instruction (opcode 1) calculates the bitwise XOR of register B and the instruction's literal operand, then stores the result in register B.
                 registers['B'] ^= program[instructionPointer + 1];
             } },
 
             // bst
             { 2, () => { 
-                // The bst instruction (opcode 2) calculates the value of its combo operand modulo 8 (thereby keeping only its lowest 3 bits),
-                // then writes that value to the B register.
                 registers['B'] = ComboOperandValue(program[instructionPointer + 1]) & 0b111;
             } },
 
             // jnz
             { 3, () => { 
-                // The jnz instruction (opcode 3) does nothing if the A register is 0. However, if the A register is not zero, it jumps by setting the
-                // instruction pointer to the
-                // value of its literal operand; if this instruction jumps, the instruction pointer is not increased by 2 after this instruction.
                 if (registers['A'] != 0)
                 {
                     instructionPointer = program[instructionPointer + 1];
@@ -67,15 +66,11 @@ public class Day17
 
             // bxc
             { 4, () => {
-                // The bxc instruction (opcode 4) calculates the bitwise XOR of register B and register C,
-                // then stores the result in register B. (For legacy reasons, this instruction reads an operand but ignores it.)
                 registers['B'] ^= registers['C'];
             } },
 
             // out
             { 5, () => { 
-                // The out instruction (opcode 5) calculates the value of its combo operand modulo 8, then outputs that value.
-                // (If a program outputs multiple values, they are separated by commas.)
                 if (result.Length > 0)
                 {
                     result.Append(',');
@@ -85,15 +80,11 @@ public class Day17
 
             // bdv
             { 6, () => {
-                // The bdv instruction (opcode 6) works exactly like the adv instruction except that the result is stored in the B register.
-                // (The numerator is still read from the A register.)
                 registers['B'] = registers['A'] / (long) Math.Pow(2, ComboOperandValue(program[instructionPointer + 1]));
             } },
 
             // cdv
             { 7, () => { 
-                // The cdv instruction (opcode 7) works exactly like the adv instruction except that the result is stored in the C register.
-                // (The numerator is still read from the A register.)
                 registers['C'] = registers['A'] / (long) Math.Pow(2, ComboOperandValue(program[instructionPointer + 1]));
             } },
         };
@@ -107,15 +98,15 @@ public class Day17
             _ => throw new InvalidOperationException($"Unknown operand {operand}")
         };
 
-        for (; ; )
+        for (;;)
         {
             if (instructionPointer > program.Count - 1)
             {
                 // program halts
                 break;
             }
-            Console.WriteLine($"IP: {instructionPointer}, A: {registers['A']}, B: {registers['B']}, C: {registers['C']}");
-            Console.WriteLine($"   Resut: {result}");
+            //Console.WriteLine($"IP: {instructionPointer}, A: {registers['A']}, B: {registers['B']}, C: {registers['C']}");
+            //Console.WriteLine($"   Resut: {result}");
 
             operations[program[instructionPointer]]();
 
@@ -165,7 +156,7 @@ public class Day17
     public void Day17_Part1()
     {
         var result = Part1(Common.DayInput(nameof(Day17), "2024"));
-        Assert.AreEqual("", result);
+        Assert.AreEqual("1,7,2,1,4,1,5,4,0", result);
     }
     
     [TestMethod]
