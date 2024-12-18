@@ -129,30 +129,118 @@ public class Day17
     
     private static string Part2(IEnumerable<string> input)
     {
-        var program = new List<int>();
-        var registerA = 0;
+        var programList = new List<int>();
         foreach (var line in input)
         {
-            if (line.Contains("Register A"))
+            if (line.Contains("Program"))
             {
-                var match = Regex.Match(line, @"Register (\w): (\d+)");
-                var value = int.Parse(match.Groups[2].Value);
-                registerA = value;
-            }
-            else if (line.Contains("Program"))
-            {
-                program = line.Substring("Program: ".Length).Split(',').Select(int.Parse).ToList();
+                programList = line.Substring("Program: ".Length).Split(',').Select(int.Parse).ToList();
             }
         }
-        string programString = string.Join(",", program);
+        string programString = string.Join(",", programList);
         //Console.WriteLine($"programString={programString}");
         //100_000_000
-        int[] programArray = program.ToArray();
+        int[] program = programList.ToArray();
         long minResult = long.MaxValue;
-        var pResult = Parallel.For(0L, long.MaxValue, new ParallelOptions() { MaxDegreeOfParallelism = 6 }, (i, state) =>
+        //117440
+        var pResult = Parallel.For(0L, 2000000000L, new ParallelOptions() { MaxDegreeOfParallelism = 1 }, (i, state) =>
         {
-            var result = Part(programArray, i, checkStartWith: true);
-            if (result == programString)
+            var isMatch = true;
+            var registers = new long[]
+            {
+                i,
+                0,
+                0
+            };
+
+            var instructionPointer = 0;
+            var hasJumped = false;
+            var outputIndex = 0;
+
+            long ComboOperandValue(int operand) => operand switch
+            {
+                >= 0 and <= 3 => operand,
+                4 => registers[0],
+                5 => registers[1],
+                6 => registers[2],
+                _ => throw new InvalidOperationException($"Unknown operand {operand}")
+            };
+
+            for (;;)
+            {
+                if (instructionPointer > program.Length - 1)
+                {
+                    // program halts
+                    break;
+                }
+
+                switch (program[instructionPointer])
+                {
+                    case 0: // adv
+                    {
+                        long x = Math.Min(ComboOperandValue(program[instructionPointer + 1]), 32);
+                        registers[0] = registers[0] >> (int) x;
+                        break;
+
+                    }
+                    case 1: // bxl
+                    {
+                        registers[1] ^= program[instructionPointer + 1];
+                        break;
+                    }
+                    case 2: // bst
+                    {
+                        registers[1] = ComboOperandValue(program[instructionPointer + 1]) & 0b111;
+                        break;
+                    }
+                    case 3: // jnz
+                    {
+                        if (registers[0] != 0)
+                        {
+                            instructionPointer = program[instructionPointer + 1];
+                            hasJumped = true;
+                        }
+                        break;
+                    }
+                    case 4: // bxc
+                    {
+                        registers[1] ^= registers[2];
+                        break;
+                    }
+                    case 5: // out
+                    {
+                        var value = ComboOperandValue(program[instructionPointer + 1]) & 0b111;
+                        if (outputIndex >= program.Length || program[outputIndex] != value)
+                        {
+                            isMatch = false;
+                            instructionPointer = program.Length;
+                        }
+                        outputIndex++;
+                        break;
+                    }
+                    case 6: // bdv
+                    {
+                        registers[1] = registers[0] >> (int) Math.Min(ComboOperandValue(program[instructionPointer + 1]), 32);
+                        break;
+                    }
+                    case 7: // cdv
+                    {
+                        registers[2] = registers[0] >> (int) Math.Min(ComboOperandValue(program[instructionPointer + 1]), 32);
+                        break;
+                    }
+                    default:
+                    {
+                        throw new InvalidOperationException($"Unknown operation {program[instructionPointer]}");
+                    }
+                };
+
+                if (!hasJumped)
+                {
+                    instructionPointer += 2;
+                }
+                hasJumped = false;
+            }
+            if (isMatch && program.Length == outputIndex + 1)
             {
                 minResult = Math.Min(i, minResult);
                 state.Break();
