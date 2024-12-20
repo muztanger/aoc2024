@@ -69,7 +69,7 @@ public class Day20
             }
         }
 
-        var savings = new DefaultValueDictionary<int, int>(() => int.MaxValue);
+        var savings = new DefaultValueDictionary<int, int>(() => 0);
         {
             var minMap = new DefaultValueDictionary<(Pos<int>, Pos<int> cheatPos), int>(() => int.MaxValue);
             var queue = new Queue<(Pos<int>, int cheat, Pos<int> cheatPos, int steps)>();
@@ -95,7 +95,7 @@ public class Day20
                 foreach (var dir in Pos<int>.CardinalDirections)
                 {
                     var newPos = pos + dir;
-                    if (visited.Contains((newPos, cheatPos)))
+                    if (visited.Contains((newPos, cheatPos)) || !box.Contains(newPos))
                     {
                         continue;
                     }
@@ -116,8 +116,9 @@ public class Day20
             }
         }
 
+        Console.WriteLine(string.Join("\n", savings.Select(savings => $"{savings.Key}: {savings.Value}")));
 
-        return result.ToString();
+        return savings.Where(s => s.Key >= 100).Sum(s => s.Value).ToString();
     }
     
     private static string Part2(IEnumerable<string> input)
