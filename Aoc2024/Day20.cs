@@ -1,9 +1,12 @@
+using Advent_of_Code_2024.Commons;
+using System;
+
 namespace Advent_of_Code_2024;
 
 [TestClass]
 public class Day20
 {
-    private static string Part1(IEnumerable<string> input)
+    private static string Part1(IEnumerable<string> input, int threshold)
     {
         var result = new StringBuilder();
         var walls = new HashSet<Pos<int>>();
@@ -118,18 +121,152 @@ public class Day20
 
         Console.WriteLine(string.Join("\n", savings.Select(savings => $"{savings.Key}: {savings.Value}")));
 
-        return savings.Where(s => s.Key >= 100).Sum(s => s.Value).ToString();
+        return savings.Where(s => s.Key >= threshold).Sum(s => s.Value).ToString();
     }
-    
-    private static string Part2(IEnumerable<string> input)
+
+    enum Cheat { NotStarted, Started, Done }
+
+    private static string Part2(IEnumerable<string> input, int threshold)
     {
         var result = new StringBuilder();
+        var walls = new HashSet<Pos<int>>();
+        var start = Pos<int>.Zero;
+        var end = Pos<int>.Zero;
+        var y = 0;
         foreach (var line in input)
         {
+            var x = 0;
+            foreach (var c in line)
+            {
+                if (c == 'S')
+                {
+                    start = new Pos<int>(x, y);
+                }
+                else if (c == 'E')
+                {
+                    end = new Pos<int>(x, y);
+                }
+                else if (c == '#')
+                {
+                    walls.Add(new Pos<int>(x, y));
+                }
+                x++;
+            }
+            y++;
         }
-        return result.ToString();
+        var box = new Box<int>(walls);
+
+        var oldFastest = int.MaxValue;
+        {
+            var minMap = new DefaultValueDictionary<Pos<int>, int>(() => int.MaxValue);
+            var queue = new Queue<(Pos<int>, int)>();
+            queue.Enqueue((start, 0));
+            var visited = new HashSet<Pos<int>>();
+            foreach (var wall in walls)
+            {
+                visited.Add(wall);
+            }
+            while (queue.Any())
+            {
+                var (pos, steps) = queue.Dequeue();
+                if (pos == end)
+                {
+                    oldFastest = steps;
+                    queue.Clear();
+                    break;
+                }
+                if (minMap[pos] <= steps)
+                {
+                    continue;
+                }
+                minMap[pos] = steps;
+                foreach (var dir in Pos<int>.CardinalDirections)
+                {
+                    var newPos = pos + dir;
+                    if (visited.Contains(newPos))
+                    {
+                        continue;
+                    }
+                    visited.Add(newPos);
+                    queue.Enqueue((newPos, steps + 1));
+                }
+            }
+        }
+
+        var savings = new DefaultValueDictionary<int, int>(() => 0);
+        {
+            var minMap = new DefaultValueDictionary<(Pos<int>, string cheatPathString), int>(() => int.MaxValue);
+            var queue = new PriorityQueue<(Pos<int> pos, Pos<int> last, Cheat cheatState, HashSet<Pos<int>> cheatPath, Pos<int> cheatStart, Pos<int> cheatEnd, int steps), int>();
+            queue.Enqueue((start, -Pos<int>.One, Cheat.NotStarted, new HashSet<Pos<int>>(), -Pos<int>.One, -Pos<int>.One, 0), 0);
+            var visited = new HashSet<(Pos<int>, string cheatPathString, int steps)>();
+            while (queue.Count > 0)
+            {
+                var (pos, last, cheat, cheatPath, cheatStart, cheatEnd, steps) = queue.Dequeue();
+
+                var cheatCountString = string.Concat(cheatStart, cheatEnd);
+                if (visited.Contains((pos, cheatCountString, steps)))
+                {
+                    continue;
+                }
+                visited.Add((pos, cheatCountString, steps));
+                
+                if (minMap[(pos, cheatCountString)] <= steps)
+                {
+                    continue;
+                }
+                minMap[(pos, cheatCountString)] = steps;
+                
+                if (pos == end)
+                {
+                    int saving = oldFastest - steps;
+                    if (saving > 0)
+                    {
+                        savings[saving]++;
+                    }
+                    continue;
+                }
+
+                foreach (var dir in Pos<int>.CardinalDirections)
+                {
+                    var newPos = pos + dir;
+                    if (!box.Contains(newPos) || newPos == last || cheatPath.Contains(newPos))
+                    {
+                        continue;
+                    }
+
+                    bool inWall = walls.Contains(newPos);
+                    if (inWall && (cheat == Cheat.NotStarted || (cheat == Cheat.Started && cheatPath.Count < 20)))
+                    {
+                        var newCheatPath = new HashSet<Pos<int>>(cheatPath)
+                        {
+                            newPos
+                        };
+                        queue.Enqueue((newPos, pos, Cheat.Started, newCheatPath, pos, -Pos<int>.One, steps + 1), steps + 1);
+                        continue;
+                    }
+                    
+                    if (inWall)
+                    {
+                        continue;
+                    }
+
+                    if (cheat == Cheat.Started)
+                    {
+                        queue.Enqueue((newPos, pos, Cheat.Done, cheatPath, cheatStart, newPos, steps + 1), steps + 1);
+                    }
+                    else
+                    {
+                        queue.Enqueue((newPos, pos, cheat, cheatPath, cheatStart, cheatEnd, steps + 1), steps + 1);
+                    }
+                }
+            }
+        }
+
+        Console.WriteLine(string.Join("\n", savings.Select(savings => $"{savings.Key}: {savings.Value}")));
+
+        return savings.Where(s => s.Key >= threshold).Sum(s => s.Value).ToString();
     }
-    
+
     [TestMethod]
     public void Day20_Part1_Example01()
     {
@@ -150,51 +287,45 @@ public class Day20
             #...#...#...###
             ###############
             """;
-        var result = Part1(Common.GetLines(input));
-        Assert.AreEqual("", result);
-    }
-    
-    [TestMethod]
-    public void Day20_Part1_Example02()
-    {
-        var input = """
-            <TODO>
-            """;
-        var result = Part1(Common.GetLines(input));
-        Assert.AreEqual("", result);
+        var result = Part1(Common.GetLines(input), 0);
+        Assert.AreEqual("44", result);
     }
     
     [TestMethod]
     public void Day20_Part1()
     {
-        var result = Part1(Common.DayInput(nameof(Day20), "2024"));
-        Assert.AreEqual("", result);
+        var result = Part1(Common.DayInput(nameof(Day20), "2024"), 100);
+        Assert.AreEqual("1365", result);
     }
     
     [TestMethod]
     public void Day20_Part2_Example01()
     {
         var input = """
-            <TODO>
+            ###############
+            #...#...#.....#
+            #.#.#.#.#.###.#
+            #S#...#.#.#...#
+            #######.#.#.###
+            #######.#.#...#
+            #######.#.###.#
+            ###..E#...#...#
+            ###.#######.###
+            #...###...#...#
+            #.#####.#.###.#
+            #.#...#.#.#...#
+            #.#.#.#.#.#.###
+            #...#...#...###
+            ###############
             """;
-        var result = Part2(Common.GetLines(input));
-        Assert.AreEqual("", result);
-    }
-    
-    [TestMethod]
-    public void Day20_Part2_Example02()
-    {
-        var input = """
-            <TODO>
-            """;
-        var result = Part2(Common.GetLines(input));
+        var result = Part2(Common.GetLines(input), 50);
         Assert.AreEqual("", result);
     }
     
     [TestMethod]
     public void Day20_Part2()
     {
-        var result = Part2(Common.DayInput(nameof(Day20), "2024"));
+        var result = Part2(Common.DayInput(nameof(Day20), "2024"), 100);
         Assert.AreEqual("", result);
     }
     
