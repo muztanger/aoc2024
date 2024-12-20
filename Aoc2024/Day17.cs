@@ -143,7 +143,8 @@ public class Day17
         int[] program = programList.ToArray();
         long minResult = long.MaxValue;
         //117440
-        var pResult = Parallel.For(0L, 2000000000L, new ParallelOptions() { MaxDegreeOfParallelism = 1 }, (i, state) =>
+        //var i = 117440;
+        var pResult = Parallel.For(0L, 80000000000000L, new ParallelOptions() { MaxDegreeOfParallelism = 12 }, (i, state) =>
         {
             var isMatch = true;
             var registers = new long[]
@@ -240,7 +241,7 @@ public class Day17
                 }
                 hasJumped = false;
             }
-            if (isMatch && program.Length == outputIndex + 1)
+            if (isMatch && program.Length == outputIndex)
             {
                 minResult = Math.Min(i, minResult);
                 state.Break();
