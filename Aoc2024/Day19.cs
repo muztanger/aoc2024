@@ -46,7 +46,7 @@ public class Day19
     
     private static string Part2(IEnumerable<string> input)
     {
-        var result = 0;
+        var result = BigInteger.Zero;
 
         var patterns = input.Where(line => line.Contains(",")).First().SplitTrim(",");
         foreach (var line in input)
@@ -60,8 +60,8 @@ public class Day19
                 continue;
             }
 
-            var memo = new Dictionary<string, int>();
-            bool CountCombinations(string str, out int count)
+            var memo = new Dictionary<string, BigInteger>();
+            bool CountCombinations(string str, out BigInteger count)
             {
                 if (memo.TryGetValue(str, out count))
                 {
@@ -81,26 +81,14 @@ public class Day19
                         isFound = true;
                         continue;
                     }
-                    var index = 0;
-                    while (index >= 0 && index < str.Length)
+                    if (str.StartsWith(pattern) && CountCombinations(str.Substring(pattern.Length), out var subCount))
                     {
-                        index = str.IndexOf(pattern, index);
-                        if (index >= 0)
-                        {
-                            var leftFound = CountCombinations(str.Substring(0, index), out var leftCount);
-                            var rightFound = CountCombinations(str.Substring(index + pattern.Length), out var rightCount);
-                            if (leftFound && rightFound)
-                            {
-                                count += leftCount + rightCount;
-                                isFound = true;
-                            }
-                            index++;
-                        }
+                        count += subCount;
+                        isFound = true;
                     }
                 }
                 if (!isFound)
                 {
-                    count = 0;
                     return false;
                 }
                 memo[str] = count;
@@ -184,6 +172,7 @@ public class Day19
     {
         var result = Part2(Common.DayInput(nameof(Day19), "2024"));
         Assert.AreNotEqual("57181", result);
+        // 468381424464337 too low
         Assert.AreEqual("", result);
     }
     
