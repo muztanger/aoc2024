@@ -1,4 +1,5 @@
 ﻿using Aoc2024.Commons;
+using System.Security.Cryptography;
 
 namespace Advent_of_Code_2024.Commons;
 public static class Common
@@ -44,6 +45,21 @@ public static class Common
             yield return line;
         }
     }
+
+    public static string ComputeHash(string rawData)
+    {
+        using (var hash = SHA1.Create())
+        {
+            byte[] bytes = hash.ComputeHash(Encoding.UTF8.GetBytes(rawData));
+            StringBuilder builder = new StringBuilder();
+            for (int i = 0; i < bytes.Length; i++)
+            {
+                builder.Append(bytes[i].ToString("x2"));
+            }
+            return builder.ToString();
+        }
+    }
+
 
     // https://stackoverflow.com/questions/228038/best-way-to-reverse-a-string?page=1&tab=votes#tab-top
     public static string Reverse(string s)

@@ -84,20 +84,6 @@ public class Day16
         return result;
     }
 
-    private static string ComputeHash(string rawData)
-    {
-        using (var hash = SHA1.Create())
-        {
-            byte[] bytes = hash.ComputeHash(Encoding.UTF8.GetBytes(rawData));
-            StringBuilder builder = new StringBuilder();
-            for (int i = 0; i < bytes.Length; i++)
-            {
-                builder.Append(bytes[i].ToString("x2"));
-            }
-            return builder.ToString();
-        }
-    }
-
     private static string Part2(IEnumerable<string> input)
     {
         int bestPathScore = LowestScore(input); //TODO reuse parse etc.
@@ -140,7 +126,7 @@ public class Day16
             {
                 path.ForEach(p => result.Add(p));
             }
-            var visitedItem = ComputeHash(string.Concat(path));
+            var visitedItem = Common.ComputeHash(string.Concat(path));
             if (visited.Contains(visitedItem))
             {
                 continue;

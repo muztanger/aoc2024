@@ -1,5 +1,6 @@
 using Advent_of_Code_2024.Commons;
 using System;
+using System.IO;
 
 namespace Advent_of_Code_2024;
 
@@ -193,7 +194,7 @@ public class Day20
             }
         }
 
-        var savings = new DefaultValueDictionary<int, int>(() => 0);
+        var savings = new DefaultValueDictionary<int, HashSet<string>>(() => []);
         {
             var minMap = new DefaultValueDictionary<(Pos<int>, string cheatPathString), int>(() => int.MaxValue);
             var queue = new PriorityQueue<(Pos<int> pos, Pos<int> last, Cheat cheatState, HashSet<Pos<int>> cheatPath, Pos<int> cheatStart, Pos<int> cheatEnd, int steps), int>();
@@ -203,25 +204,25 @@ public class Day20
             {
                 var (pos, last, cheat, cheatPath, cheatStart, cheatEnd, steps) = queue.Dequeue();
 
-                var cheatCountString = string.Concat(cheatStart, cheatEnd);
-                if (visited.Contains((pos, cheatCountString, steps)))
+                var cheatPathHash = Common.ComputeHash(string.Concat(cheatPath));
+                if (visited.Contains((pos, cheatPathHash, steps)))
                 {
                     continue;
                 }
-                visited.Add((pos, cheatCountString, steps));
-                
-                if (minMap[(pos, cheatCountString)] <= steps)
+                visited.Add((pos, cheatPathHash, steps));
+
+                if (minMap[(pos, cheatPathHash)] <= steps)
                 {
                     continue;
                 }
-                minMap[(pos, cheatCountString)] = steps;
+                minMap[(pos, cheatPathHash)] = steps;
                 
                 if (pos == end)
                 {
                     int saving = oldFastest - steps;
                     if (saving > 0)
                     {
-                        savings[saving]++;
+                        savings[saving].Add(string.Concat(cheatStart, cheatEnd));
                     }
                     continue;
                 }
@@ -264,7 +265,7 @@ public class Day20
 
         Console.WriteLine(string.Join("\n", savings.Select(savings => $"{savings.Key}: {savings.Value}")));
 
-        return savings.Where(s => s.Key >= threshold).Sum(s => s.Value).ToString();
+        return savings.Where(s => s.Key >= threshold).Sum(s => s.Value.Count).ToString();
     }
 
     [TestMethod]
