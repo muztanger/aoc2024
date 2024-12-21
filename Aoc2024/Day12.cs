@@ -64,31 +64,31 @@ public class Day12
                 }
             }
 
-            void PrintPerimeter() {
-                Console.WriteLine($"Perimeter for plant '{Plant}'");
-                var box = new Box<int>(perimeters);
-                for (var y = box.Min.y; y <= box.Max.y; y++)
-                {
-                    for (var x = box.Min.x; x <= box.Max.x; x++)
-                    {
-                        var pos = new Pos<int>(x, y);
-                        if (perimeters.Contains(pos))
-                        {
-                            Console.Write('■');
-                        }
-                        else if (zoomed.Contains(pos))
-                        {
-                            Console.Write('□');
-                        }
-                        else
-                        {
-                            Console.Write(' ');
-                        }
-                    }
-                    Console.WriteLine();
-                }
-                Console.WriteLine();
-            }
+            //void PrintPerimeter() {
+            //    Console.WriteLine($"Perimeter for plant '{Plant}'");
+            //    var box = new Box<int>(perimeters);
+            //    for (var y = box.Min.y; y <= box.Max.y; y++)
+            //    {
+            //        for (var x = box.Min.x; x <= box.Max.x; x++)
+            //        {
+            //            var pos = new Pos<int>(x, y);
+            //            if (perimeters.Contains(pos))
+            //            {
+            //                Console.Write('■');
+            //            }
+            //            else if (zoomed.Contains(pos))
+            //            {
+            //                Console.Write('□');
+            //            }
+            //            else
+            //            {
+            //                Console.Write(' ');
+            //            }
+            //        }
+            //        Console.WriteLine();
+            //    }
+            //    Console.WriteLine();
+            //}
             //PrintPerimeter();
 
             // find all corners

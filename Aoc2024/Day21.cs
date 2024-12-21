@@ -206,13 +206,26 @@ public class Day21
     }
 
     [TestMethod]
-    public void Day21_TestRobot()
+    public void TestNumericRobot()
     {
         var robot = new Robot(new NumericKeyPad());
         var paths = robot.FindShortestPaths("029A");
-        Assert.AreEqual(1, paths.Count());
+        Assert.IsTrue(paths.Contains("<A^A>^^AvvvA"));
+        Assert.IsTrue(paths.Contains("<A^A^>^AvvvA"));
+        Assert.IsTrue(paths.Contains("<A^A^^>AvvvA"));
+        Assert.AreEqual(3, paths.Count());
     }
-    
+
+    [TestMethod]
+    public void TestDirectionalRobot()
+    {
+        var numericRobot = new Robot(new NumericKeyPad());
+        var robot = new Robot(new DirectionalKeyPad(), numericRobot);
+        var paths = robot.FindShortestPaths("029A");
+        //Assert.IsTrue(paths.Contains("v<<A>>^A<A>AvA<^AA>A<vAAA>^A"));
+        Assert.AreEqual(3, paths.Count());
+    }
+
     [TestMethod]
     public void Day21_Part1_Example01()
     {

@@ -177,11 +177,11 @@ public class Day14
             return result.ToString();
         }
 
-        void Print()
-        {
-            Console.WriteLine(ToString());
-            Console.WriteLine();
-        }
+        //void Print()
+        //{
+        //    Console.WriteLine(ToString());
+        //    Console.WriteLine();
+        //}
 
         int width = space.Width / 2;
         int height = space.Height / 2;
