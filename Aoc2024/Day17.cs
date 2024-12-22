@@ -1,3 +1,4 @@
+using Newtonsoft.Json.Linq;
 using System.Reflection.Emit;
 
 namespace Advent_of_Code_2024;
@@ -143,8 +144,23 @@ public class Day17
         long minResult = long.MaxValue;
         //117440
         //var i = 117440;
-        var pResult = Parallel.For(0L, long.MaxValue, (i, state) =>
+        //var pResult = Parallel.For(0L, long.MaxValue, (i, state) =>
+        //111011100111110100
+        // 01011110111110100 (11)
+        //     ...0111110100 <-- all numbers with 8 correct outputs ends with this
+
+        //i = 101000100110000100000000101001011110111110100, outputIndex = 13, value = 3
+        //i = 101000100110000100000010101001011110111110100, outputIndex = 13, value = 3
+        //i = 101000100110000100000010101101011110111110100, outputIndex = 13, value = 3
+        //i = 101000100110000100000100101001011110111110100, outputIndex = 13, value = 3
+
+
+        long printThreshold = 13;
+        for (long j = 0; j < 400_000_000; j++)
         {
+            //long i = (0b1010001001100001 << 5) | j;
+            long i = (j << 17) | 0b01011110111110100;
+            //Console.WriteLine($"i={Convert.ToString(i, 2)}");
             var isMatch = true;
             var registers = new long[]
             {
@@ -226,6 +242,10 @@ public class Day17
                             isMatch = false;
                             instructionPointer = program.Length;
                         }
+                        if (outputIndex >= printThreshold && isMatch)
+                        {
+                            Console.WriteLine($"i={Convert.ToString(i, 2)}, outputIndex={outputIndex}, value={value}");
+                        }
                         outputIndex++;
                         break;
                     }
@@ -268,9 +288,9 @@ public class Day17
             if (isMatch && program.Length == outputIndex)
             {
                 minResult = Math.Min(i, minResult);
-                state.Break();
+                break;
             }
-        });
+        }//);
         if (minResult < long.MaxValue)
         {
             return minResult.ToString();
