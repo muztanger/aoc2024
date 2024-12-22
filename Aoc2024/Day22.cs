@@ -188,7 +188,7 @@ public class Day22
     public void Day22_Part2()
     {
         var result = Part2(Common.DayInput(nameof(Day22), "2024"));
-        Assert.AreEqual("", result);
+        Assert.AreEqual("1938", result);
     }
     
 }
