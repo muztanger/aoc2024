@@ -25,10 +25,10 @@ public class Day17
         Console.WriteLine(string.Join(", ", program));
         return Part(program.ToArray(), registerA);
     }
-    private static string Part(int[] program, long registerA, bool checkStartWith = false)
+    private static string Part(int[] program, int registerA, bool checkStartWith = false)
     {
         var result = new StringBuilder();
-        var registers = new long[]
+        var registers = new int[]
         {
             registerA,
             0,
@@ -43,8 +43,7 @@ public class Day17
             // adv
             () => {
                 
-                long x = Math.Min(ComboOperandValue(program[instructionPointer + 1]), 32);
-                registers[0] = registers[0] >> (int) x;
+                registers[0] = registers[0] >> ComboOperandValue(program[instructionPointer + 1]);
             },
             
             // bxl
@@ -88,16 +87,16 @@ public class Day17
 
             // bdv
             () => {
-                registers[1] = registers[0] >> (int) Math.Min(ComboOperandValue(program[instructionPointer + 1]), 32);
+                registers[1] = registers[0] >> ComboOperandValue(program[instructionPointer + 1]);
             },
 
             // cdv
-            () => { 
-                registers[2] = registers[0] >> (int) Math.Min(ComboOperandValue(program[instructionPointer + 1]), 32);
+            () => {
+                registers[2] = registers[0] >> ComboOperandValue(program[instructionPointer + 1]);
             },
         };
 
-        long ComboOperandValue(int operand) => operand switch
+        int ComboOperandValue(int operand) => operand switch
         {
             >= 0 and <= 3 => operand,
             4 => registers[0],
@@ -144,7 +143,7 @@ public class Day17
         long minResult = long.MaxValue;
         //117440
         //var i = 117440;
-        var pResult = Parallel.For(0L, 80000000000000L, new ParallelOptions() { MaxDegreeOfParallelism = 12 }, (i, state) =>
+        var pResult = Parallel.For(0L, long.MaxValue, (i, state) =>
         {
             var isMatch = true;
             var registers = new long[]
@@ -158,15 +157,6 @@ public class Day17
             var hasJumped = false;
             var outputIndex = 0;
 
-            long ComboOperandValue(int operand) => operand switch
-            {
-                >= 0 and <= 3 => operand,
-                4 => registers[0],
-                5 => registers[1],
-                6 => registers[2],
-                _ => throw new InvalidOperationException($"Unknown operand {operand}")
-            };
-
             for (;;)
             {
                 if (instructionPointer > program.Length - 1)
@@ -179,8 +169,14 @@ public class Day17
                 {
                     case 0: // adv
                     {
-                        long x = Math.Min(ComboOperandValue(program[instructionPointer + 1]), 32);
-                        registers[0] = registers[0] >> (int) x;
+                        registers[0] = registers[0] >> (program[instructionPointer + 1] switch
+                        {
+                            >= 0 and <= 3 => program[instructionPointer + 1],
+                            4 => (int)registers[0],
+                            5 => (int)registers[1],
+                            6 => (int)registers[2],
+                            _ => throw new InvalidOperationException($"Unknown operand {program[instructionPointer + 1]}")
+                        });
                         break;
 
                     }
@@ -191,7 +187,14 @@ public class Day17
                     }
                     case 2: // bst
                     {
-                        registers[1] = ComboOperandValue(program[instructionPointer + 1]) & 0b111;
+                        registers[1] = (program[instructionPointer + 1] switch
+                        {
+                            >= 0 and <= 3 => program[instructionPointer + 1],
+                            4 => registers[0],
+                            5 => registers[1],
+                            6 => registers[2],
+                            _ => throw new InvalidOperationException($"Unknown operand {program[instructionPointer + 1]}")
+                        }) & 0b111;
                         break;
                     }
                     case 3: // jnz
@@ -210,7 +213,14 @@ public class Day17
                     }
                     case 5: // out
                     {
-                        var value = ComboOperandValue(program[instructionPointer + 1]) & 0b111;
+                        var value = program[instructionPointer + 1] switch
+                        {
+                            >= 0 and <= 3 => program[instructionPointer + 1],
+                            4 => registers[0],
+                            5 => registers[1],
+                            6 => registers[2],
+                            _ => throw new InvalidOperationException($"Unknown operand {program[instructionPointer + 1]}")
+                        } & 0b111;
                         if (outputIndex >= program.Length || program[outputIndex] != value)
                         {
                             isMatch = false;
@@ -221,12 +231,26 @@ public class Day17
                     }
                     case 6: // bdv
                     {
-                        registers[1] = registers[0] >> (int) Math.Min(ComboOperandValue(program[instructionPointer + 1]), 32);
+                        registers[1] = registers[0] >> (program[instructionPointer + 1]  switch
+                        {
+                            >= 0 and <= 3 => program[instructionPointer + 1],
+                            4 => (int)registers[0],
+                            5 => (int)registers[1],
+                            6 => (int)registers[2],
+                            _ => throw new InvalidOperationException($"Unknown operand {program[instructionPointer + 1]}")
+                        });
                         break;
                     }
                     case 7: // cdv
                     {
-                        registers[2] = registers[0] >> (int) Math.Min(ComboOperandValue(program[instructionPointer + 1]), 32);
+                        registers[2] = registers[0] >> (program[instructionPointer + 1] switch
+                        {
+                            >= 0 and <= 3 => program[instructionPointer + 1],
+                            4 => (int)registers[0],
+                            5 => (int)registers[1],
+                            6 => (int)registers[2],
+                            _ => throw new InvalidOperationException($"Unknown operand {program[instructionPointer + 1]}")
+                        });
                         break;
                     }
                     default:
