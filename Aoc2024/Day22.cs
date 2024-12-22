@@ -37,14 +37,9 @@ public class Day22
         var initialValues = input.Select(long.Parse).ToArray();
 
         // Brute forcing all possible sequences of 4 numbers...Takes to long to run
-        for (int d1 = -9; d1 <= 9; d1++)
-        for (int d2 = -9; d2 <= 9; d2++)
-        for (int d3 = -9; d3 <= 9; d3++)
-        for (int d4 = -9; d4 <= 9; d4++)
+        // TODO find all sequences of 4 numbers that exists in the input
+        var sequences = new DefaultValueDictionary<string, long[]>(() => [0, 0, 0, 0, 0, 0, 0, 0, 0, 0]);
         {
-            long[] sequence = [d1, d2, d3, d4];
-            long sum = 0L;
-
             foreach (var initialSecretNumber in initialValues)
             {
                 long[] lastFourDiffs = [int.MinValue, int.MinValue, int.MinValue, int.MinValue];
@@ -59,7 +54,49 @@ public class Day22
                     lastFourDiffs[diffIndex] = x % 10 - lastX % 10; //TODO faster way to get last digit?
                     diffIndex = (diffIndex + 1) & 3;
                     // compare lastFourDiffs with sequence
-                    if (i > 3)
+                    if (i >= 3)
+                    {
+                        long[] sequence = [
+                            lastFourDiffs[(diffIndex + 1) & 3],
+                            lastFourDiffs[(diffIndex + 2) & 3],
+                            lastFourDiffs[(diffIndex + 3) & 3],
+                            lastFourDiffs[diffIndex]];
+                        var key = string.Join(',', sequence);
+                        sequences[key][x % 10]++;
+                    }
+                    lastX = x;
+                    //Console.WriteLine($"{initialSecretNumber}: {x}");
+                }
+            }
+        }
+
+        foreach (var sequenceString in sequences.Inner.OrderByDescending(kv => {
+            var sum = 0L;
+            for (int i = 0; i < 10; i++) { 
+                sum += kv.Value[i] * i;
+            }
+            return sum;
+        }).Select(kv => kv.Key))
+        {
+            long[] sequence = sequenceString.Split(',').Select(long.Parse).ToArray();
+            long sum = 0L;
+
+            var secretIndex = 0;
+            foreach (var initialSecretNumber in initialValues)
+            {
+                long[] lastFourDiffs = [int.MinValue, int.MinValue, int.MinValue, int.MinValue];
+                long lastX = initialSecretNumber;
+                long x = initialSecretNumber;
+                var diffIndex = 0;
+                for (long i = 0; i < 2000; i++)
+                {
+                    x = ((x << 6) ^ x) & 0xFFFFFF;
+                    x = ((x >> 5) ^ x) & 0xFFFFFF;
+                    x = ((x << 11) ^ x) & 0xFFFFFF;
+                    lastFourDiffs[diffIndex] = x % 10 - lastX % 10; //TODO faster way to get last digit?
+                    diffIndex = (diffIndex + 1) & 3;
+                    // compare lastFourDiffs with sequence
+                    if (i >= 3)
                     {
                         var match = true;
                         for (int j = 0; j < 4; j++)
@@ -77,9 +114,16 @@ public class Day22
                             break;
                         }
                     }
+                    
                     lastX = x;
                     //Console.WriteLine($"{initialSecretNumber}: {x}");
                 }
+                if (result > sum + (initialValues.Length - secretIndex - 1) * 9)
+                {
+                    // No need to continue
+                    break;
+                }
+                secretIndex++;
             }
 
             result = Math.Max(result, sum);
