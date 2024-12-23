@@ -149,6 +149,8 @@ public class Day17
         // 01011110111110100 (11)
         //     ...0111110100 <-- all numbers with 8 correct outputs ends with this
 
+        //TODO solve by iteratively searching for the correct input number by checking the common suffixes of input binary numbers for the cases where the output is most correct
+
         //i = 101000100110000100000000101001011110111110100, outputIndex = 13, value = 3
         //i = 101000100110000100000010101001011110111110100, outputIndex = 13, value = 3
         //i = 101000100110000100000010101101011110111110100, outputIndex = 13, value = 3
