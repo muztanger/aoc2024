@@ -79,8 +79,6 @@ public class Day21
 
         public IEnumerable<string> FindShortestPaths(string code)
         {
-            var result = new List<string>();
-            
             foreach (var subPath in _child is not null ? _child.FindShortestPaths(code) : [code])
             {
                 var pathParts = new List<List<string>>();
@@ -139,29 +137,27 @@ public class Day21
                     pathParts.Add(subPaths);
                 }
 
-                var pathQueue = new Queue<(int partIndex, string part)>();
+                var stack = new Stack<(int partIndex, string part)>();
                 foreach (var path in pathParts[0])
                 {
-                    pathQueue.Enqueue((0, path));
+                    stack.Push((0, path));
                 }
-                while (pathQueue.Count > 0)
+                while (stack.Count > 0)
                 {
-                    var (partIndex, part) = pathQueue.Dequeue();
+                    var (partIndex, part) = stack.Pop();
                     if (partIndex == pathParts.Count - 1)
                     {
-                        result.Add(part);
+                        yield return part;
                     }
                     else
                     {
                         foreach (var nextPart in pathParts[partIndex + 1])
                         {
-                            pathQueue.Enqueue((partIndex + 1, part + nextPart));
+                            stack.Push((partIndex + 1, part + nextPart));
                         }
                     }
                 }
             }
-
-            return result;
         }
 
         internal int LengthOfShortestSequence(string code)
@@ -189,6 +185,7 @@ public class Day21
             var numeric = int.Parse(code[..^1]);
             var length = coldRobot.LengthOfShortestSequence(code);
             result += numeric * length;
+            Console.WriteLine($"{code} => {numeric} * {length} = {numeric * length}");
         }
 
         return result.ToString();
@@ -196,10 +193,22 @@ public class Day21
     
     private static string Part2(IEnumerable<string> input)
     {
-        var result = new StringBuilder();
-        foreach (var line in input)
+        var numericRobot = new Robot(new NumericKeyPad());
+        var robot = new Robot(new DirectionalKeyPad(), numericRobot);
+        for (int i = 0; i < 24; i++)
         {
+            robot = new Robot(new DirectionalKeyPad(), robot);
         }
+
+        var result = 0;
+        foreach (var code in input)
+        {
+            var numeric = int.Parse(code[..^1]);
+            var length = robot.LengthOfShortestSequence(code);
+            result += numeric * length;
+            Console.WriteLine($"{code} => {numeric} * {length} = {numeric * length}");
+        }
+
         return result.ToString();
     }
 
@@ -261,29 +270,9 @@ public class Day21
     public void Day21_Part1()
     {
         var result = Part1(Common.DayInput(nameof(Day21), "2024"));
-        Assert.AreEqual("", result);
+        Assert.AreEqual("188398", result);
     }
-    
-    [TestMethod]
-    public void Day21_Part2_Example01()
-    {
-        var input = """
-            <TODO>
-            """;
-        var result = Part2(Common.GetLines(input));
-        Assert.AreEqual("", result);
-    }
-    
-    [TestMethod]
-    public void Day21_Part2_Example02()
-    {
-        var input = """
-            <TODO>
-            """;
-        var result = Part2(Common.GetLines(input));
-        Assert.AreEqual("", result);
-    }
-    
+        
     [TestMethod]
     public void Day21_Part2()
     {
