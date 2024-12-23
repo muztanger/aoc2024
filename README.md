@@ -26,13 +26,13 @@ Ideas on what to try out:
 | 14  | :star: :star: | 51.6 s|
 | 15  | :star: :star: | 54.4 s|
 | 16  | :star: :star: | 1.2 min|
-| 17  | ||
+| 17  | :star: :star: | n/a|
 | 18  | ||
-| 19  | ||
-| 20  | ||
+| 19  | :star: :star: ||
+| 20  | :star: ||
 | 21  | ||
-| 22  | ||
-| 23  | ||
+| 22  | :star: :star:||
+| 23  | :star: :star:||
 | 24  | ||
 | 25  | ||
 
