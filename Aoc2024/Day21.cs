@@ -224,6 +224,16 @@ public class Day21
     }
 
     [TestMethod]
+    public void TestSecondDirectionalRobot()
+    {
+        var numericRobot = new Robot(new NumericKeyPad());
+        var subRobot = new Robot(new DirectionalKeyPad(), numericRobot);
+        var robot = new Robot(new DirectionalKeyPad(), subRobot);
+        var paths = robot.FindShortestPaths("029A");
+        Assert.IsTrue(paths.Contains("<vA<AA>>^AvAA<^A>A<v<A>>^AvA^A<vA>^A<v<A>^A>AAvA^A<v<A>A>^AAAvA<^A>A"));
+    }
+
+    [TestMethod]
     public void Day21_Part1_Example01()
     {
         var input = """
@@ -234,7 +244,7 @@ public class Day21
             379A
             """;
         var result = Part1(Common.GetLines(input));
-        Assert.AreEqual("", result);
+        Assert.AreEqual("126384", result);
     }
     
     [TestMethod]
