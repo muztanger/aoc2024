@@ -6,7 +6,7 @@ public class Day23
     class Computer
     {
         required public string Name { get; set; }
-        public List<Computer> Connections { get; set; } = [];
+        public HashSet<Computer> Connections { get; set; } = [];
 
         public override bool Equals(object? obj)
         {
@@ -140,19 +140,13 @@ public class Day23
             var (left, right) = line.Split('-');
             var leftComputer = networkMap.First(c => c.Name == left);
             var rightComputer = networkMap.First(c => c.Name == right);
-            if (!leftComputer.Connections.Contains(rightComputer))
-            {
-                leftComputer.Connections.Add(rightComputer);
-            }
-            if (!rightComputer.Connections.Contains(leftComputer))
-            {
-                rightComputer.Connections.Add(leftComputer);
-            }
+            leftComputer.Connections.Add(rightComputer);
+            rightComputer.Connections.Add(leftComputer);
         }
 
         var found = new List<string>();
         var visited = new HashSet<string>();
-        var queue = new Queue<List<Computer>>();
+        var queue = new Queue<HashSet<Computer>>();
         foreach (var computer in networkMap)
         {
             queue.Enqueue([computer]);
@@ -176,7 +170,7 @@ public class Day23
                 }
                 if (current.All(c => c.Connections.Contains(computer)))
                 {
-                    var next = new List<Computer>(current) { computer };
+                    var next = new HashSet<Computer>(current) { computer };
                     queue.Enqueue(next);
                 }
             }
