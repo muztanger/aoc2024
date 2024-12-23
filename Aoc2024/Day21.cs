@@ -79,10 +79,11 @@ public class Day21
 
         public IEnumerable<string> FindShortestPaths(string code)
         {
+            var result = new List<string>();
             
-            var pathParts = new List<List<string>>();
             foreach (var subPath in _child is not null ? _child.FindShortestPaths(code) : [code])
             {
+                var pathParts = new List<List<string>>();
                 foreach (var c in subPath)
                 {
                     // find all shortests paths between Pos and c
@@ -135,35 +136,32 @@ public class Day21
                     }
 
                     Pos = new Pos<int>(end);
-                    if (pathParts.Count > 0)
+                    pathParts.Add(subPaths);
+                }
+
+                var pathQueue = new Queue<(int partIndex, string part)>();
+                foreach (var path in pathParts[0])
+                {
+                    pathQueue.Enqueue((0, path));
+                }
+                while (pathQueue.Count > 0)
+                {
+                    var (partIndex, part) = pathQueue.Dequeue();
+                    if (partIndex == pathParts.Count - 1)
                     {
-                        pathParts.Add(subPaths);
+                        result.Add(part);
                     }
                     else
                     {
-                        pathParts.Add(subPaths);
+                        foreach (var nextPart in pathParts[partIndex + 1])
+                        {
+                            pathQueue.Enqueue((partIndex + 1, part + nextPart));
+                        }
                     }
                 }
             }
 
-            var pathQueue = new Queue<(int partIndex, string part)>();
-            pathQueue.Enqueue((0, pathParts[0][0]));
-            while (pathQueue.Count > 0)
-            {
-                var (partIndex, part) = pathQueue.Dequeue();
-                if (partIndex == pathParts.Count - 1)
-                {
-                    yield return part;
-                }
-                else
-                {
-                    foreach (var sub in pathParts[partIndex + 1])
-                    {
-                        pathQueue.Enqueue((partIndex + 1, part + sub));
-                    }
-                }
-            }
-
+            return result;
         }
 
         internal int LengthOfShortestSequence(string code)
@@ -222,8 +220,7 @@ public class Day21
         var numericRobot = new Robot(new NumericKeyPad());
         var robot = new Robot(new DirectionalKeyPad(), numericRobot);
         var paths = robot.FindShortestPaths("029A");
-        //Assert.IsTrue(paths.Contains("v<<A>>^A<A>AvA<^AA>A<vAAA>^A"));
-        Assert.AreEqual(3, paths.Count());
+        Assert.IsTrue(paths.Contains("v<<A>>^A<A>AvA<^AA>A<vAAA>^A"));
     }
 
     [TestMethod]
