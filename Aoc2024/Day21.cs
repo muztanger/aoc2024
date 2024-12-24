@@ -64,6 +64,8 @@ public class Day21
         public Pos<int> Pos { get; set; }
         private readonly KeyPad _keyPad;
         private readonly Robot? _child = null;
+        private readonly Dictionary<(char, char), List<string>> _pathMemo = [];
+
         public Robot(KeyPad keyPad)
         {
             _keyPad = keyPad;
@@ -79,6 +81,62 @@ public class Day21
 
         public IEnumerable<string> FindShortestPaths(string code)
         {
+            List<string> FindPaths(char startChar, char endChar)
+            {
+                if (_pathMemo.TryGetValue((startChar, endChar), out var paths))
+                {
+                    return paths;
+                }
+                var start = _keyPad.KeyPos(startChar);
+                var end = _keyPad.KeyPos(endChar);
+                var queue = new PriorityQueue<(Pos<int> pos, string path), int>();
+                var minPathPos = new DefaultValueDictionary<Pos<int>, int>(() => int.MaxValue);
+                var visited = new HashSet<string>();
+                var subPaths = new List<string>();
+                queue.Enqueue((start, ""), 0);
+                while (queue.Count > 0)
+                {
+                    var (pos, path) = queue.Dequeue();
+
+                    if (!_keyPad.Contains(pos))
+                    {
+                        continue;
+                    }
+
+                    if (visited.Contains(path))
+                    {
+                        continue;
+                    }
+                    visited.Add(path);
+
+                    if (minPathPos[pos] < path.Length)
+                    {
+                        continue;
+                    }
+                    minPathPos[pos] = path.Length;
+
+                    if (pos == end)
+                    {
+                        subPaths.Add(path + "A");
+                    }
+
+                    foreach (var dir in Pos<int>.CardinalDirections)
+                    {
+                        var next = pos + dir;
+                        var dirChar = dir switch
+                        {
+                            Pos<int> p when p == Pos<int>.East => '>',
+                            Pos<int> p when p == Pos<int>.South => 'v',
+                            Pos<int> p when p == Pos<int>.West => '<',
+                            Pos<int> p when p == Pos<int>.North => '^',
+                            _ => throw new InvalidOperationException()
+                        };
+                        queue.Enqueue((next, path + dirChar), path.Length + 1);
+                    }
+                }
+                _pathMemo.Add((startChar, endChar), subPaths);
+                return subPaths;
+            }
             foreach (var subPath in _child is not null ? _child.FindShortestPaths(code) : [code])
             {
                 var pathParts = new List<List<string>>();
@@ -86,74 +144,35 @@ public class Day21
                 {
                     // find all shortests paths between Pos and c
                     var start = Pos;
-                    var end = _keyPad.KeyPos(c);
-                    var queue = new PriorityQueue<(Pos<int> pos, string path), int>();
-                    var minPathPos = new DefaultValueDictionary<Pos<int>, int>(() => int.MaxValue);
-                    var visited = new HashSet<string>();
-                    var subPaths = new List<string>();
-                    queue.Enqueue((start, ""), 0);
-                    while (queue.Count > 0)
-                    {
-                        var (pos, path) = queue.Dequeue();
-
-                        if (!_keyPad.Contains(pos))
-                        {
-                            continue;
-                        }
-
-                        if (visited.Contains(path))
-                        {
-                            continue;
-                        }
-                        visited.Add(path);
-                        
-                        if (minPathPos[pos] < path.Length)
-                        {
-                            continue;
-                        }
-                        minPathPos[pos] = path.Length;
-
-                        if (pos == end)
-                        {
-                            subPaths.Add(path + "A");
-                        }
-                        
-                        foreach (var dir in Pos<int>.CardinalDirections)
-                        {
-                            var next = pos + dir;
-                            var dirChar = dir switch
-                            {
-                                Pos<int> p when p == Pos<int>.East => '>',
-                                Pos<int> p when p == Pos<int>.South => 'v',
-                                Pos<int> p when p == Pos<int>.West => '<',
-                                Pos<int> p when p == Pos<int>.North => '^',
-                                _ => throw new InvalidOperationException()
-                            };
-                            queue.Enqueue((next, path + dirChar), path.Length + 1);
-                        }
-                    }
-
-                    Pos = new Pos<int>(end);
-                    pathParts.Add(subPaths);
+                    //var end = _keyPad.KeyPos(endChar);
+                    var subPaths = FindPaths(_keyPad.PosKey(start), c);
+                    Pos = new Pos<int>(_keyPad.KeyPos(c));
+                    int minLength = subPaths.Min(p => p.Length);
+                    pathParts.Add(subPaths.Where(p => p.Length == minLength).ToList());
                 }
 
-                var stack = new Stack<(int partIndex, string part)>();
-                foreach (var path in pathParts[0])
+                var stack = new Stack<(int partIndex, List<int> indexes)>();
+                for (int i = 0; i < pathParts[0].Count; i++)
                 {
-                    stack.Push((0, path));
+                    stack.Push((0, [i]));
                 }
                 while (stack.Count > 0)
                 {
-                    var (partIndex, part) = stack.Pop();
+                    var (partIndex, indexes) = stack.Pop();
                     if (partIndex == pathParts.Count - 1)
                     {
-                        yield return part;
+                        var result = new StringBuilder();
+                        for (int i = 0; i < pathParts.Count; i++)
+                        {
+                            result.Append(pathParts[i][indexes[i]]);
+                        }
+                        yield return result.ToString();
                     }
                     else
                     {
-                        foreach (var nextPart in pathParts[partIndex + 1])
+                        for (int i = 0; i < pathParts[partIndex + 1].Count; i++)
                         {
-                            stack.Push((partIndex + 1, part + nextPart));
+                            stack.Push((partIndex + 1, new List<int>(indexes) {i}));
                         }
                     }
                 }
@@ -254,16 +273,6 @@ public class Day21
             """;
         var result = Part1(Common.GetLines(input));
         Assert.AreEqual("126384", result);
-    }
-    
-    [TestMethod]
-    public void Day21_Part1_Example02()
-    {
-        var input = """
-            <TODO>
-            """;
-        var result = Part1(Common.GetLines(input));
-        Assert.AreEqual("", result);
     }
     
     [TestMethod]
