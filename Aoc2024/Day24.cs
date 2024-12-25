@@ -1,7 +1,7 @@
 using System.ComponentModel.DataAnnotations;
 using System.Diagnostics.Metrics;
 
-namespace Advent_of_Code_2024;
+namespace Advent_of_Code_2024.NotFinished;
 
 [TestClass]
 public class Day24

@@ -2,7 +2,7 @@ using Advent_of_Code_2024.Commons;
 using System;
 using System.IO;
 
-namespace Advent_of_Code_2024;
+namespace Advent_of_Code_2024.NotFinished;
 
 [TestClass]
 public class Day20

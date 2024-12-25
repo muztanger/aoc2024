@@ -1,4 +1,4 @@
-namespace Advent_of_Code_2024;
+namespace Advent_of_Code_2024.NotFinished;
 
 [TestClass]
 public class Day25
@@ -128,24 +128,14 @@ public class Day25
             #####
             """;
         var result = Part1(Common.GetLines(input));
-        Assert.AreEqual("", result);
-    }
-    
-    [TestMethod]
-    public void Day25_Part1_Example02()
-    {
-        var input = """
-            <TODO>
-            """;
-        var result = Part1(Common.GetLines(input));
-        Assert.AreEqual("", result);
+        Assert.AreEqual("3", result);
     }
     
     [TestMethod]
     public void Day25_Part1()
     {
         var result = Part1(Common.DayInput(nameof(Day25), "2024"));
-        Assert.AreEqual("", result);
+        Assert.AreEqual("3365", result);
     }
     
     [TestMethod]
