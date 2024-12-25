@@ -37,41 +37,7 @@ public class Day20
         }
         var box = new Box<int>(walls);
 
-        var oldFastest = int.MaxValue;
-        var oldMinMap = new DefaultValueDictionary<Pos<int>, int>(() => int.MaxValue);
-        {
-            var queue = new Queue<(Pos<int>, int)>();
-            queue.Enqueue((start, 0));
-            var visited = new HashSet<Pos<int>>();
-            foreach (var wall in walls) {
-                visited.Add(wall);
-            }
-            while (queue.Any())
-            {
-                var (pos, steps) = queue.Dequeue();
-                if (pos == end)
-                {
-                    oldFastest = steps;
-                    queue.Clear();
-                    break;
-                }
-                if (oldMinMap[pos] <= steps)
-                {
-                    continue;
-                }
-                oldMinMap[pos] = steps;
-                foreach (var dir in Pos<int>.CardinalDirections)
-                {
-                    var newPos = pos + dir;
-                    if (visited.Contains(newPos))
-                    {
-                        continue;
-                    }
-                    visited.Add(newPos);
-                    queue.Enqueue((newPos, steps + 1));
-                }
-            }
-        }
+        NoCheatFastest(walls, start, end, box, out int oldFastest, out DefaultValueDictionary<Pos<int>, int>  oldMinMap);
 
         var savings = new DefaultValueDictionary<int, int>(() => 0);
         {
@@ -126,6 +92,40 @@ public class Day20
         return savings.Where(s => s.Key >= threshold).Sum(s => s.Value).ToString();
     }
 
+    private static void NoCheatFastest(HashSet<Pos<int>> walls, Pos<int> start, Pos<int> end, Box<int> box, out int oldFastest, out DefaultValueDictionary<Pos<int>, int> oldMinMap)
+    {
+        oldFastest = int.MaxValue;
+        oldMinMap = new DefaultValueDictionary<Pos<int>, int>(() => int.MaxValue);
+        {
+            var queue = new Queue<(Pos<int>, int)>();
+            queue.Enqueue((start, 0));
+            while (queue.Any())
+            {
+                var (pos, steps) = queue.Dequeue();
+                if (pos == end)
+                {
+                    oldFastest = steps;
+                    queue.Clear();
+                    break;
+                }
+                if (oldMinMap[pos] <= steps)
+                {
+                    continue;
+                }
+                oldMinMap[pos] = steps;
+                foreach (var dir in Pos<int>.CardinalDirections)
+                {
+                    var newPos = pos + dir;
+                    if (walls.Contains(newPos) || !box.Contains(newPos))
+                    {
+                        continue;
+                    }
+                    queue.Enqueue((newPos, steps + 1));
+                }
+            }
+        }
+    }
+
     enum Cheat { NotStarted, Started, Done }
 
     private static string Part2(IEnumerable<string> input, int threshold)
@@ -158,42 +158,7 @@ public class Day20
         }
         var box = new Box<int>(walls);
 
-        var oldFastest = int.MaxValue;
-        {
-            var minMap = new DefaultValueDictionary<Pos<int>, int>(() => int.MaxValue);
-            var queue = new Queue<(Pos<int>, int)>();
-            queue.Enqueue((start, 0));
-            var visited = new HashSet<Pos<int>>();
-            foreach (var wall in walls)
-            {
-                visited.Add(wall);
-            }
-            while (queue.Any())
-            {
-                var (pos, steps) = queue.Dequeue();
-                if (pos == end)
-                {
-                    oldFastest = steps;
-                    queue.Clear();
-                    break;
-                }
-                if (minMap[pos] <= steps)
-                {
-                    continue;
-                }
-                minMap[pos] = steps;
-                foreach (var dir in Pos<int>.CardinalDirections)
-                {
-                    var newPos = pos + dir;
-                    if (visited.Contains(newPos))
-                    {
-                        continue;
-                    }
-                    visited.Add(newPos);
-                    queue.Enqueue((newPos, steps + 1));
-                }
-            }
-        }
+        NoCheatFastest(walls, start, end, box, out int noCheatFastest, out DefaultValueDictionary<Pos<int>, int> noCheatMinMap);
 
         var savings = new DefaultValueDictionary<int, HashSet<string>>(() => []);
         {
@@ -205,7 +170,7 @@ public class Day20
             {
                 var (pos, last, cheat, cheatPath, cheatStart, cheatEnd, steps) = queue.Dequeue();
 
-                if (minMap[pos] <= steps)
+                if (noCheatMinMap[pos] < steps || minMap[pos] <= steps)
                 {
                     continue;
                 }
@@ -213,7 +178,7 @@ public class Day20
                 
                 if (pos == end)
                 {
-                    int saving = oldFastest - steps;
+                    int saving = noCheatFastest - steps;
                     if (saving > 0)
                     {
                         savings[saving].Add(string.Concat(cheatStart, cheatEnd));
