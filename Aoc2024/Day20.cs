@@ -38,8 +38,8 @@ public class Day20
         var box = new Box<int>(walls);
 
         var oldFastest = int.MaxValue;
+        var oldMinMap = new DefaultValueDictionary<Pos<int>, int>(() => int.MaxValue);
         {
-            var minMap = new DefaultValueDictionary<Pos<int>, int>(() => int.MaxValue);
             var queue = new Queue<(Pos<int>, int)>();
             queue.Enqueue((start, 0));
             var visited = new HashSet<Pos<int>>();
@@ -55,11 +55,11 @@ public class Day20
                     queue.Clear();
                     break;
                 }
-                if (minMap[pos] <= steps)
+                if (oldMinMap[pos] <= steps)
                 {
                     continue;
                 }
-                minMap[pos] = steps;
+                oldMinMap[pos] = steps;
                 foreach (var dir in Pos<int>.CardinalDirections)
                 {
                     var newPos = pos + dir;
@@ -76,10 +76,9 @@ public class Day20
         var savings = new DefaultValueDictionary<int, int>(() => 0);
         {
             var minMap = new DefaultValueDictionary<(Pos<int>, Pos<int> cheatPos), int>(() => int.MaxValue);
-            var queue = new Queue<(Pos<int>, int cheat, Pos<int> cheatPos, int steps)>();
-            queue.Enqueue((start, 1, start, 0));
-            var visited = new HashSet<(Pos<int>, Pos<int> cheatPos)>();
-            while (queue.Any())
+            var queue = new PriorityQueue<(Pos<int>, int cheat, Pos<int> cheatPos, int steps), int>();
+            queue.Enqueue((start, 1, start, 0), 0);
+            while (queue.Count > 0)
             {
                 var (pos, cheat, cheatPos, steps) = queue.Dequeue();
                 if (pos == end)
@@ -91,31 +90,33 @@ public class Day20
                     }
                     continue;
                 }
-                if (minMap[(pos, cheatPos)] <= steps)
+
+                if (oldMinMap[pos] < steps || minMap[(pos, cheatPos)] <= steps)
                 {
                     continue;
                 }
                 minMap[(pos, cheatPos)] = steps;
+
                 foreach (var dir in Pos<int>.CardinalDirections)
                 {
                     var newPos = pos + dir;
-                    if (visited.Contains((newPos, cheatPos)) || !box.Contains(newPos))
+                    if (!box.Contains(newPos))
                     {
                         continue;
                     }
 
                     bool inWall = walls.Contains(newPos);
-                    if (cheat > 0 && inWall && box.Contains(newPos))
+                    if (cheat > 0 && inWall)
                     {
-                        queue.Enqueue((newPos, cheat - 1, newPos, steps + 1));
+                        queue.Enqueue((newPos, cheat - 1, newPos, steps + 1), steps + 1);
                         continue;
                     }
                     if (inWall)
                     {
                         continue;
                     }
-                    visited.Add((newPos, cheatPos));
-                    queue.Enqueue((newPos, cheat, cheatPos, steps + 1));
+
+                    queue.Enqueue((newPos, cheat, cheatPos, steps + 1), steps + 1);
                 }
             }
         }
@@ -196,7 +197,7 @@ public class Day20
 
         var savings = new DefaultValueDictionary<int, HashSet<string>>(() => []);
         {
-            var minMap = new DefaultValueDictionary<(Pos<int>, string cheatPathString), int>(() => int.MaxValue);
+            var minMap = new DefaultValueDictionary<Pos<int>, int>(() => int.MaxValue);
             var queue = new PriorityQueue<(Pos<int> pos, Pos<int> last, Cheat cheatState, HashSet<Pos<int>> cheatPath, Pos<int> cheatStart, Pos<int> cheatEnd, int steps), int>();
             queue.Enqueue((start, -Pos<int>.One, Cheat.NotStarted, new HashSet<Pos<int>>(), -Pos<int>.One, -Pos<int>.One, 0), 0);
             var visited = new HashSet<(Pos<int>, string cheatPathString, int steps)>();
@@ -204,18 +205,11 @@ public class Day20
             {
                 var (pos, last, cheat, cheatPath, cheatStart, cheatEnd, steps) = queue.Dequeue();
 
-                var cheatPathHash = Common.ComputeHash(string.Concat(cheatPath));
-                if (visited.Contains((pos, cheatPathHash, steps)))
+                if (minMap[pos] <= steps)
                 {
                     continue;
                 }
-                visited.Add((pos, cheatPathHash, steps));
-
-                if (minMap[(pos, cheatPathHash)] <= steps)
-                {
-                    continue;
-                }
-                minMap[(pos, cheatPathHash)] = steps;
+                minMap[pos] = steps;
                 
                 if (pos == end)
                 {
