@@ -1,4 +1,5 @@
 using System.ComponentModel.DataAnnotations;
+using System.Diagnostics.Metrics;
 
 namespace Advent_of_Code_2024;
 
@@ -63,12 +64,10 @@ public class Day24
         }
     }
 
-
-    private static string Part1(IEnumerable<string> input)
+    private static void ParseInputToWiresAndGates(IEnumerable<string> input, out Dictionary<string, Wire> wires, out List<Gate> gates)
     {
-        var result = new StringBuilder();
-        var wires = new Dictionary<string, Wire>();
-        var gates = new List<Gate>();
+        wires = new Dictionary<string, Wire>();
+        gates = new List<Gate>();
         foreach (var line in input)
         {
             if (line.Contains(':'))
@@ -109,31 +108,103 @@ public class Day24
                 gates.Add(new Gate { Name = outputName, Operation = operation, Input1 = wire1, Input2 = wire2, Output = output });
             }
         }
+    }
+
+    private static string Part1(IEnumerable<string> input)
+    {
+        ParseInputToWiresAndGates(input, out var wires, out var gates);
         int count = 0;
         while (gates.Where(g => g.Output.Name.StartsWith("z")).Any(g => !g.TryCalculate()))
         {
             count++;
             gates.ForEach(g => g.TryCalculate());
         }
+        long value = BitsToLong(wires, 'z');
+        return value.ToString();
+    }
+
+    private static long BitsToLong(Dictionary<string, Wire> wires, char letter)
+    {
         var stack = new Stack<char>();
         int i = 0;
-        while (wires.TryGetValue($"z{i:00}", out Wire? wire))
+        while (wires.TryGetValue($"{letter}{i:00}", out Wire? wire))
         {
             stack.Push(wire.Value == true ? '1' : '0');
             i++;
         }
 
         string value = string.Concat(stack);
-        return Convert.ToInt64(value, 2).ToString();
+        return Convert.ToInt64(value, 2);
     }
-    
+
     private static string Part2(IEnumerable<string> input)
     {
-        var result = new StringBuilder();
-        foreach (var line in input)
+        ParseInputToWiresAndGates(input, out var originalWires, out var originalGates);
+        var outputs = new List<string>(originalGates.Select(g => g.Output.Name));
+
+        // Testing everything is too slow
+        // 222 choose 8 = 128,795,283,347,445
+        long xValue = BitsToLong(originalWires, 'x');
+        long yValue = BitsToLong(originalWires, 'y');
+        var zExpected = xValue + yValue;
+        var zExpectedString = Convert.ToString(zExpected, 2);
+
+        // find the four pairs of swapped outputs
+        var stack = new Stack<List<string>>();
+        var visited = new HashSet<string>();
+        var result = long.MinValue;
+        do
         {
+            ParseInputToWiresAndGates(input, out var wires, out var gates);
+
+            if (stack.Count > 0)
+            {
+                var swap = stack.Pop();
+                var visitedString = string.Join(',', swap.OrderBy(s => s));
+                if (visited.Contains(visitedString))
+                {
+                    continue;
+                }
+                for (int i = 0; i < swap.Count; i += 2)
+                {
+                    var output1 = swap[i];
+                    var output2 = swap[i + 1];
+                    var gate1 = gates.First(g => g.Output.Name == output1);
+                    var gate2 = gates.First(g => g.Output.Name == output2);
+                    (gate2.Output, gate1.Output) = (gate1.Output, gate2.Output);
+                }
+            }
+
+            while (gates.Where(g => g.Output.Name.StartsWith("z")).Any(g => !g.TryCalculate()))
+            {
+                gates.ForEach(g => g.TryCalculate());
+            }
+
+            for (int i = 0; wires.TryGetValue($"z{i:00}", out Wire? wire); i++)
+            {
+                Assert.IsTrue(wire.Value.HasValue); // fail or only disregard?
+                if (wire.Value != (zExpectedString[i] == '1'))
+                {
+                    // find all the outputs leading to this wire
+                    var outputsToSwap = new List<string>();
+                    //var stack = new Stack<string>();
+                    foreach (var gate in gates)
+                    {
+                        if (gate.Output.Name == wire.Name)
+                        {
+                            outputsToSwap.Add(gate.Input1.Name);
+                            outputsToSwap.Add(gate.Input2.Name);
+                        }
+                    }
+                }
+
+            }
+
+            result = BitsToLong(wires, 'z');
         }
-        return result.ToString();
+        while (stack.Count > 0 && zExpected != result);
+
+        return (-1).ToString();
     }
     
     [TestMethod]
@@ -222,7 +293,25 @@ public class Day24
     public void Day24_Part2_Example01()
     {
         var input = """
-            <TODO>
+            x00: 0
+            x01: 1
+            x02: 0
+            x03: 1
+            x04: 0
+            x05: 1
+            y00: 0
+            y01: 0
+            y02: 1
+            y03: 1
+            y04: 0
+            y05: 1
+
+            x00 AND y00 -> z05
+            x01 AND y01 -> z02
+            x02 AND y02 -> z01
+            x03 AND y03 -> z03
+            x04 AND y04 -> z04
+            x05 AND y05 -> z00
             """;
         var result = Part2(Common.GetLines(input));
         Assert.AreEqual("", result);

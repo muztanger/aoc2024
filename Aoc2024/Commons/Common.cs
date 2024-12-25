@@ -150,7 +150,7 @@ public static class Common
                 (t1, t2) => t1.Concat(new T[] { t2 }));
     }
 
-    static void Swap<T>(ref T a, ref T b)
+    public static void Swap<T>(ref T a, ref T b)
     {
         (b, a) = (a, b);
     }
