@@ -27,12 +27,12 @@ Ideas on what to try out:
 | 15  | :star: :star: | 54.4 s||
 | 16  | :star: :star: | 1.2 min||
 | 17  | :star: :star: | n/a| Partly solved manually|
-| 18  | |||
+| 18  | :star: :star: |||
 | 19  | :star: :star: |||
 | 20  | :star: |||
-| 21  | |||
+| 21  | :star: |||
 | 22  | :star: :star:|||
 | 23  | :star: :star:|||
-| 24  | |||
-| 25  | |||
+| 24  | :star: |||
+| 25  | :star: |||
 
