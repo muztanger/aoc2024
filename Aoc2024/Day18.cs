@@ -3,10 +3,10 @@ namespace Advent_of_Code_2024.NotFinished;
 [TestClass]
 public class Day18
 {
-    private static string Part1(IEnumerable<string> input)
+    private static string Part1(IEnumerable<string> input, int time)
     {
         var result = new StringBuilder();
-        var incoming = new DefaultValueDictionary<Pos<int>, List<int>>(() => new List<int>());
+        var incoming = new DefaultValueDictionary<Pos<int>, List<int>>(() => []);
         var lineIndex = 0;
         foreach (var line in input)
         {
@@ -44,20 +44,23 @@ public class Day18
             }
         }
 
-        var time = 12;
-        var queue = new PriorityQueue<(Pos<int> pos, int time, List<Pos<int>> path), int>();
+        var queue = new PriorityQueue<(Pos<int> pos, int steps, List<Pos<int>> path), int>();
         queue.Enqueue((Pos<int>.Zero, 0, new List<Pos<int>> { Pos<int>.Zero }), 0);
+        var minSteps = new DefaultValueDictionary<Pos<int>, int>(() => int.MaxValue);
         while (queue.Count > 0)
         {
-            var (pos, _, path) = queue.Dequeue();
-            if (incoming[pos].DefaultIfEmpty(int.MaxValue).Max() <= time)
+            var (pos, steps, path) = queue.Dequeue();
+            
+            if (minSteps[pos] <= steps)
             {
                 continue;
             }
+            minSteps[pos] = steps;
+
             if (pos == box.Max)
             {
                 Console.WriteLine(string.Join(" -> ", path));
-                result.Append(time);
+                result.Append(steps);
                 Print(0, path);
                 break;
             }
@@ -68,7 +71,11 @@ public class Day18
                 {
                     continue;
                 }
-                queue.Enqueue((newPos, time + 1, new List<Pos<int>>(path) { newPos }), time + 1);
+                if (incoming[newPos].DefaultIfEmpty(int.MaxValue).Max() < time)
+                {
+                    continue;
+                }
+                queue.Enqueue((newPos, steps + 1, [..path, newPos]), steps + 1);
             }
         }
         return result.ToString();
@@ -113,16 +120,16 @@ public class Day18
             1,6
             2,0
             """;
-        var result = Part1(Common.GetLines(input));
-        Assert.AreEqual("", result);
+        var result = Part1(Common.GetLines(input), 12);
+        Assert.AreEqual("22", result);
     }
     
    
     [TestMethod]
     public void Day18_Part1()
     {
-        var result = Part1(Common.DayInput(nameof(Day18), "2024"));
-        Assert.AreEqual("", result);
+        var result = Part1(Common.DayInput(nameof(Day18), "2024"), 1024);
+        Assert.AreEqual("22", result);
     }
     
     [TestMethod]
