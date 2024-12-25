@@ -1,4 +1,4 @@
-namespace Advent_of_Code_2024.NotFinished;
+namespace Advent_of_Code_2024;
 
 [TestClass]
 public class Day18
