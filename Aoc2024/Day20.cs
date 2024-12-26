@@ -125,7 +125,7 @@ public class Day20
         }
     }
 
-    enum Cheat { NotStarted, Started, Done }
+    enum Cheat { Init, CollitionDisabled, Done }
 
     private static string Part2(IEnumerable<string> input, int threshold)
     {
@@ -163,7 +163,7 @@ public class Day20
         {
             var minMap = new DefaultValueDictionary<(Pos<int> pos, Pos<int> cheatStart, Pos<int> cheatEnd), int>(() => int.MaxValue);
             var queue = new PriorityQueue<(Pos<int> pos, Cheat cheatState, int cheatCount, Pos<int> cheatStart, Pos<int> cheatEnd, int steps), int>();
-            queue.Enqueue((start, Cheat.NotStarted, 0, -Pos<int>.One, -Pos<int>.One, 0), 0);
+            queue.Enqueue((start, Cheat.Init, 0, -Pos<int>.One, -Pos<int>.One, 0), 0);
             var visited = new HashSet<(Pos<int>, string cheatCountString, int steps)>();
             while (queue.Count > 0)
             {
@@ -175,7 +175,7 @@ public class Day20
                 }
                 minMap[(pos, cheatStart, cheatEnd)] = steps;
                 
-                if (pos == end)
+                if (pos == end && cheatEnd != -Pos<int>.One)
                 {
                     int saving = noCheatFastest - steps;
                     if (saving >= threshold)
@@ -193,31 +193,30 @@ public class Day20
                         continue;
                     }
 
-                    bool inWall = walls.Contains(newPos);
-                    if (inWall) 
+                    if (walls.Contains(newPos)) 
                     {
-                        if (cheat == Cheat.NotStarted)
+                        if (cheat == Cheat.Init)
                         {
-                            queue.Enqueue((newPos, Cheat.Started, cheatCount + 1, pos, -Pos<int>.One, steps + 1), steps + 1);
+                            queue.Enqueue((newPos, Cheat.CollitionDisabled, cheatCount + 1, pos, -Pos<int>.One, steps + 1), steps + 1);
                         }
-                        else if (cheat == Cheat.Started && cheatCount < 20)
+                        else if (cheat == Cheat.CollitionDisabled && cheatCount < 20)
                         {
-                            queue.Enqueue((newPos, Cheat.Started, cheatCount + 1, cheatStart, -Pos<int>.One, steps + 1), steps + 1);
+                            queue.Enqueue((newPos, Cheat.CollitionDisabled, cheatCount + 1, cheatStart, -Pos<int>.One, steps + 1), steps + 1);
                         }
 
                         continue;
                     }
 
-                    if (cheat == Cheat.Started)
+                    if (cheat == Cheat.CollitionDisabled)
                     {
-                        var newCheatEnd = walls.Contains(pos) ? newPos : cheatEnd;
                         if (cheatCount < 20)
                         {
-                            queue.Enqueue((newPos, cheat, cheatCount + 1, cheatStart, newCheatEnd, steps + 1), steps + 1);
+                            queue.Enqueue((newPos, Cheat.Done, cheatCount + 1, cheatStart, newPos, steps + 1), steps + 1);
+                            queue.Enqueue((newPos, Cheat.CollitionDisabled, cheatCount + 1, cheatStart, cheatEnd, steps + 1), steps + 1);
                         }
                         else
                         {
-                            queue.Enqueue((newPos, Cheat.Done, cheatCount, cheatStart, newCheatEnd, steps + 1), steps + 1);
+                            queue.Enqueue((newPos, Cheat.Done, cheatCount, cheatStart, newPos, steps + 1), steps + 1);
                         }
                     }
                     else
