@@ -159,28 +159,42 @@ public class Day20
 
         NoCheatFastest(walls, start, end, box, out int noCheatFastest, out DefaultValueDictionary<Pos<int>, int> noCheatMinMap);
 
-        var savings = new DefaultValueDictionary<int, HashSet<string>>(() => []);
+        var savings = new DefaultValueDictionary<int, HashSet<(Pos<int> start, Pos<int> end)>>(() => []);
         {
             var minMap = new DefaultValueDictionary<(Pos<int> pos, Pos<int> cheatStart, Pos<int> cheatEnd), int>(() => int.MaxValue);
-            var queue = new PriorityQueue<(Pos<int> pos, Cheat cheatState, int cheatCount, Pos<int> cheatStart, Pos<int> cheatEnd, int steps), int>();
-            queue.Enqueue((start, Cheat.Init, 0, -Pos<int>.One, -Pos<int>.One, 0), 0);
-            var visited = new HashSet<(Pos<int>, string cheatCountString, int steps)>();
+            var queue = new PriorityQueue<(Pos<int> pos, Cheat cheatState, int cheatCount, Pos<int> cheatStart, List<Pos<int>> cheatPath, int steps), int>();
+            queue.Enqueue((start, Cheat.Init, 0, -Pos<int>.One, [], 0), 0);
             while (queue.Count > 0)
             {
-                var (pos, cheat, cheatCount, cheatStart, cheatEnd, steps) = queue.Dequeue();
+                var (pos, cheat, cheatCount, cheatStart, cheatPath, steps) = queue.Dequeue();
+                
+                Pos<int> FirstNonWallAfterLastWall()
+                {
+                    int i = cheatPath.Count - 1;
+                    while (i >= 0 && !walls.Contains(cheatPath[i]))
+                    {
+                        i--;
+                    }
+                    if (i < 0 || i >= cheatPath.Count - 1)
+                    {
+                        return -Pos<int>.One;
+                    }
+                    return cheatPath[i + 1];
+                }
+                var cheatEnd = FirstNonWallAfterLastWall();
 
-                if (noCheatMinMap[pos] < steps || minMap[(pos, cheatStart, cheatEnd)] <= steps)
+                if (minMap[(pos, cheatStart, cheatEnd)] <= steps)
                 {
                     continue;
                 }
                 minMap[(pos, cheatStart, cheatEnd)] = steps;
                 
-                if (pos == end && cheatEnd != -Pos<int>.One)
+                if (pos == end)
                 {
                     int saving = noCheatFastest - steps;
                     if (saving >= threshold)
                     {
-                        savings[saving].Add(string.Concat(cheatStart, cheatEnd));
+                        savings[saving].Add((cheatStart, cheatEnd));
                     }
                     continue;
                 }
@@ -197,11 +211,11 @@ public class Day20
                     {
                         if (cheat == Cheat.Init)
                         {
-                            queue.Enqueue((newPos, Cheat.CollitionDisabled, cheatCount + 1, pos, -Pos<int>.One, steps + 1), steps + 1);
+                            queue.Enqueue((newPos, Cheat.CollitionDisabled, cheatCount + 1, pos, [newPos], steps + 1), steps + 1);
                         }
                         else if (cheat == Cheat.CollitionDisabled && cheatCount < 20)
                         {
-                            queue.Enqueue((newPos, Cheat.CollitionDisabled, cheatCount + 1, cheatStart, -Pos<int>.One, steps + 1), steps + 1);
+                            queue.Enqueue((newPos, Cheat.CollitionDisabled, cheatCount + 1, cheatStart, [..cheatPath, newPos], steps + 1), steps + 1);
                         }
 
                         continue;
@@ -211,23 +225,51 @@ public class Day20
                     {
                         if (cheatCount < 20)
                         {
-                            queue.Enqueue((newPos, Cheat.Done, cheatCount + 1, cheatStart, newPos, steps + 1), steps + 1);
-                            queue.Enqueue((newPos, Cheat.CollitionDisabled, cheatCount + 1, cheatStart, cheatEnd, steps + 1), steps + 1);
+                            queue.Enqueue((newPos, Cheat.Done,              cheatCount + 1, cheatStart, [..cheatPath, newPos], steps + 1), steps + 1);
+                            queue.Enqueue((newPos, Cheat.CollitionDisabled, cheatCount + 1, cheatStart, [..cheatPath, newPos], steps + 1), steps + 1);
                         }
                         else
                         {
-                            queue.Enqueue((newPos, Cheat.Done, cheatCount, cheatStart, newPos, steps + 1), steps + 1);
+                            queue.Enqueue((newPos, Cheat.Done, cheatCount, cheatStart, cheatPath, steps + 1), steps + 1);
                         }
                     }
                     else
                     {
-                        queue.Enqueue((newPos, cheat, cheatCount, cheatStart, cheatEnd, steps + 1), steps + 1);
+                        queue.Enqueue((newPos, cheat, cheatCount, cheatStart, cheatPath, steps + 1), steps + 1);
                     }
                 }
             }
         }
 
-        Console.WriteLine(string.Join("\n", savings.Select(savings => $"{savings.Key}: {savings.Value.Count}: {string.Join(",", savings.Value)}")));
+        foreach (var kv in savings)
+        {
+            Console.WriteLine($"{kv.Key}: {kv.Value.Count}");
+            foreach (var p in box.GetPositions())
+            {
+                if (kv.Value.Where(s => s.start == p).Any())
+                {
+                    Console.Write('S');
+                }
+                else if (kv.Value.Where(s => s.end == p).Any())
+                {
+                    Console.Write('D');
+                }
+                else if (walls.Contains(p))
+                {
+                    Console.Write("#");
+                }
+                else
+                {
+                    Console.Write(".");
+                }
+                if (p.x == box.Max.x)
+                {
+                    Console.WriteLine();
+                }
+            }
+        }
+
+            Console.WriteLine(string.Join("\n", savings.Select(savings => $"{savings.Key}: {savings.Value.Count}: {string.Join(",", savings.Value)}")));
 
         return savings.Where(s => s.Key >= threshold).Sum(s => s.Value.Count).ToString();
     }
